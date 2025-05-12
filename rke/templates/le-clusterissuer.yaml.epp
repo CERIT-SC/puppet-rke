@@ -1,0 +1,37 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  labels:
+    name: <%= $dnsissuer %>
+  name: <%= $dnsissuer %>
+spec:
+  acme:
+    email: <%= $email %>
+    preferredChain: ""
+    privateKeySecretRef:
+      name: <%= $secretref %>
+    server: <%= $serverurl %>
+    solvers:
+<%- if $nameserver { -%>
+    - dns01:
+        rfc2136:
+          nameserver: <%= $nameserver %>
+          tsigAlgorithm: <%= $keyalgo %>
+          tsigKeyName: <%= $keyname %>
+          tsigSecretSecretRef:
+            key: key
+            name: <%= $tsigsecret %>
+<%- if $domain { -%>
+      selector:
+        dnsZones:
+<%- $domain.each |$_d| { -%>
+        - '<%= $_d %>'
+<%- } -%>
+<%- } -%>
+<%- } -%>
+<%- if $ingressclass { -%>
+    - http01:
+        ingress:
+          class: <%= $ingressclass %>
+          serviceType: ClusterIP 
+<%- } -%>

@@ -1,0 +1,10 @@
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "<%= $name %>"
+spec:
+  blocks:
+<%- $cidrs.each |$_cidr| { -%>
+    - cidr: "<%= $_cidr %>"
+<%- } -%>

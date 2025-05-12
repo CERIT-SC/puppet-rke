@@ -1,0 +1,173 @@
+<%- if $server and $token { -%>
+server: https://<%= $server %>:9345
+<%- } -%>
+<%- if $token != undef { -%>
+token: <%= $token %>
+
+<%- } -%>
+<%- if $taint != undef { -%>
+node-taint:
+  - <%= $taint %>
+
+<%- } -%>
+<%- if $nodetype =~ /controlplane/ { -%>
+<%- if $tlsnames != undef { -%>
+tls-san:
+<%- $tlsnames.each |$_name| { -%>
+  - <%= $_name %>
+<%- } -%>
+
+<%- } -%>
+<%- if $tlssecurity { -%>
+tls-san-security: true
+
+<%- } -%>
+<%- if $internalingress == false { -%>
+<%- if $cni != undef and $cni != 'canal' { -%>
+disable: 
+  - rke2-ingress-nginx
+  - rke2-canal
+
+<%- } else { -%>
+disable:
+  - rke2-ingress-nginx
+
+<%- }  -%>
+<%- } else {-%>
+<%- if $cni != 'canal' and $cni != undef { -%>
+disable:
+  - rke2-canal
+
+<%- } -%>
+<%- } -%>
+<%- if $cni { -%>
+cni: <%= $cni %>
+<%- } %>
+<%- } -%>
+<%- if $clustercidr { -%>
+cluster-cidr: <%= $clustercidr %>
+
+<%- } -%>
+<%- if $servicecidr { -%>
+service-cidr: <%= $servicecidr %>
+
+<%- } -%>
+<%- if $nodetype =~ /controlplane/ { -%>
+<%- if $nodev6cidr { -%>
+kube-controller-manager-arg:
+<%- if $controllerfgates { -%>
+        - "feature-gates=<%= $controllerfgates %>"
+<%- } -%>
+        - "node-cidr-mask-size-ipv6=<%= $nodev6cidr %>"
+
+<%- } else { -%>
+<%- if $controllerfgates { -%>
+kube-controller-manager-arg:
+        - "feature-gates=<%= $controllerfgates %>"
+
+<%- } -%>
+<%- } -%>
+<%- } -%>
+<%- if $nodetype =~ /controlplane/ { -%>
+<%- if $auditlog { -%>
+audit-policy-file: "/etc/rancher/rke2/audit-policy.yaml"
+
+<%- } -%>
+<%- if $auditlog { -%>
+kube-apiserver-arg:<% } %>
+<%- if $kubeapifgates { -%>
+        - "feature-gates=<%= $kubeapifgates %>"
+<%- } -%>
+<%- if $auditlog { -%>
+        - "audit-log-maxage=30"
+        - "audit-log-maxbackup=10"
+<%- if $auditlogfile { -%>
+        - "audit-log-path=<%= $auditlogfile %>"
+<%- } else { -%>
+        - "audit-log-path=-"
+
+<%- } -%>
+        - "audit-log-maxsize=100"
+        - "audit-log-format=json"
+        - "audit-policy-file=/etc/rancher/rke2/audit-policy.yaml"
+
+<%- } -%>
+<%- if $etcds3accesskey { -%>
+etcd-s3-access-key: <%= $etcds3accesskey %>
+<%- } -%>
+<%- if $etcds3secretkey { -%>
+etcd-s3-secret-key: <%= $etcds3secretkey %>
+<%- } -%>
+<%- if $etcds3endpoint { -%>
+etcd-s3: true
+etcd-s3-endpoint: <%= $etcds3endpoint %>
+<%- } -%>
+<%- if $etcds3path { -%>
+etcd-s3-bucket: <%= regsubst($etcds3path, '/.*', '') %>
+<%- if regsubst($etcds3path, '^.*/', '') != "" { -%>
+etcd-s3-folder: <%= regsubst($etcds3path, '^.*/', '') %>
+<%- } -%>
+<%- } -%>
+etcd-snapshot-schedule-cron: '0 */6 * * *'
+etcd-snapshot-retention: 10
+
+<%- } -%>
+<%- if $labels != undef { -%>
+node-label:
+<%- $labels.each |$_k, $_v| { -%>
+  - "<%= $_k %>=<%= $_v %>"
+<%- } -%>
+
+<%- } -%>
+<%- if $profile != undef { -%>
+profile: <%= $profile %>
+
+<%- } -%>
+<%- if $nodetype =~ /controlplane/ { -%>
+<%- if $schedulerpolicy or $schedulerfgates { -%>
+kube-scheduler-arg:
+<%- if $schedulerfgates { -%>
+  - "feature-gates=<%= $schedulerfgates %>"
+<%- } -%>
+<%- if $schedulerpolicy { -%>
+  - config=<%= $schedulerpolicy %>
+<%- } -%>
+
+<%- } -%>
+<%- } -%>
+kubelet-arg:
+  - "v=5"
+<%- if $kubeconfig { -%>
+  - 'config=/var/lib/rancher/rke2/agent/etc/kubelet.config'
+<%- } -%>
+<%- if $kubeletfgates { -%>
+  - "feature-gates=<%= $kubeletfgates %>"
+<%- } -%>
+<%- if $nodeip { -%>
+  - "node-ip=<%= $nodeip %>"
+<%- } -%>
+<%- if $kubeletargs { -%>
+<%- $kubeletargs.each |$_arg| { -%>
+  - "<%= $_arg %>"
+<%- } -%>
+<%- } -%>
+
+<%- if $nodeip { -%>
+node-ip: '<%= $nodeip %>'
+
+<%- } -%>
+<%- if $nodetype =~ /controlplane/ { -%>
+<%- if $controlplanerequests { -%>
+control-plane-resource-requests: "kube-apiserver-memory=3G,etcd-memory=32G"
+
+<%- } -%>
+<%- } -%>
+<%- if $disableproxy { -%>
+disable-kube-proxy: true
+
+<%- } -%>
+<%- if $nodetype =~ /controlplane/ { -%>
+<%- if $psaconfig { -%>
+pod-security-admission-config-file: <%= $psaconfig %>
+<%- } -%>
+<%- } -%>

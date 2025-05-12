@@ -1,0 +1,46 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-cilium
+  namespace: kube-system
+spec:
+  valuesContent: |-
+<%- if $autodirectnoderouters != undef { -%>
+    autoDirectNodeRoutes: <%= $autodirectnoderouters %>
+<%- } -%>
+<%- if $routingmode != undef { -%>
+    routingMode: "<%= $routingmode %>"
+<%- } -%>
+<%- if $l2announcements != undef { -%>
+    l2announcements:
+      enabeld: <%= $l2announcements %>
+<%- } -%>
+<%- if $bgpcontrolplane != undef { -%>
+    bgpControlPlane: 
+      enabled: <%= $bgpcontrolplane %>
+<%- } -%>
+<%- if $externalips != undef { -%>
+    externalIPs:
+      enabled: <%= $externalips %>
+<%- } -%>
+<%- if $ipv4cidr != undef { -%>
+    ipv4NativeRoutingCIDR: <%= $ipv4cidr %>
+<%- } -%>
+<%- if $ipv6cidr != undef { -%>
+    ipv6NativeRoutingCIDR: <%= $ipv6cidr %>
+<%- } -%>
+    bpfClockProbe: true
+<%- if $cniexclusive != undef { -%>
+    cni:
+      exclusive: <%= $cniexclusive %>
+<%- } -%>
+    annotateK8sNode: true
+<%- if $proxyreplacement != undef { -%>
+    kubeProxyReplacement: <%= $proxyreplacement %>
+<%- } -%>
+    k8sServiceHost: "localhost"
+    k8sServicePort: "6443"
+<%- if $hostfirewall != undef { -%>
+    hostFirewall:
+      enabled: <%= $hostfirewall %>
+<%- } -%>

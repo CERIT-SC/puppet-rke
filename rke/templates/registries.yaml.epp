@@ -1,0 +1,22 @@
+configs:
+<%- $registries.each |$_name, $_v| { -%>  
+  "<%= $_name %>":
+    auth:
+      <%- $_v.each |$_k, $_v1| { -%>
+      <%= $_k %>: <%= $_v1 %>
+      <%- } -%>
+<%- } -%>
+
+<%- if $dockermirror or $custommirror { -%>
+mirrors:
+<%- if $dockermirror { -%>
+  docker.io:
+    endpoint:
+      - "<%= $dockermirror %>"
+    rewrite:
+      "^(.*)": "docker/$1"
+<%- } -%>
+<%- if $custommirror { -%>
+  <%= $custommirror %>
+<%- } -%>
+<%- } -%> 

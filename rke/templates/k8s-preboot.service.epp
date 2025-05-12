@@ -1,0 +1,13 @@
+[Unit]
+Description=Kubernetes node drainer befoer reboot
+After=network-online.target rke2-server.service rke2-agent.service
+
+[Service]
+Type=oneshot
+Environment=KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+RemainAfterExit=true
+TimeoutStopSec=900
+ExecStop=/bin/bash -c "/var/lib/rancher/rke2/bin/kubectl cordon %H; /var/lib/rancher/rke2/bin/kubectl drain %H --grace-period=120 --delete-emptydir-data --force --ignore-daemonsets; umount -a -t nfs"
+
+[Install]
+WantedBy=multi-user.target

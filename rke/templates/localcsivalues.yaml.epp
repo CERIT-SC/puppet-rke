@@ -1,0 +1,7 @@
+classes:
+- name: <%= $name %>
+  hostDir: <%= $localdir %>
+  volumeMode: Filesystem
+  accessMode: ReadWriteMany
+  storageClass: 
+    isDefaultClass: <%= $default %>

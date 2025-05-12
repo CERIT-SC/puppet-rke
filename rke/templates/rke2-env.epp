@@ -1,0 +1,7 @@
+<%- if $proxy { -%>
+HTTP_PROXY=<%= $proxy %>
+HTTPS_PROXY=<%= $proxy %>
+<%- } -%>
+<% if $noproxy { -%>
+NO_PROXY=<%= $noproxy %>
+<%- } -%>

@@ -1,0 +1,99 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-ingress-nginx
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    controller:
+      kind: Deployment
+      extraArgs:
+        enable-annotation-validation: true
+      hostNetwork: false
+      hostPort:
+        enabled: false
+<%- if $maxreplicas > 1 { -%>
+      autoscaling:
+        enabled: true
+        minReplicas: 1
+        maxReplicas: <%= $maxreplicas %>
+<%- } else { -%>
+      autoscaling:
+        enabled: false
+<%- } -%>
+      resources:
+        requests:
+<%- if $cpu != undef { -%>
+          cpu: <%= $cpu %>
+<%- } else { -%>
+          cpu: 100m
+<%- } -%>
+<%- if $memory != undef { -%>
+          memory: <%= $memory %>
+<%- } else { -%>
+          memory: 90Mi
+<%- } -%>
+      service:
+        enabled: true
+        type: LoadBalancer
+<%- if $ipfamilies =~ Array { -%>
+        ipFamilies: ["<%= $ipfamilies.join('","') %>"]
+        ipFamilyPolicy: RequireDualStack
+<%- } -%>
+<%- if $ipfamilies =~ String { -%>
+        ipFamilies: ["<%= $ipfamilies %>"]
+<%- } -%>
+        allocateLoadBalancerNodePorts: false
+<%- if $externaltraffic != undef { -%>
+        externalTrafficPolicy: <%= $externaltraffic %>
+<%- } -%>
+        annotations:
+          <%= $ipannotation %>: <%= $lbip %>
+<%- if $openstacktimeout { -%>
+          loadbalancer.openstack.org/timeout-client-data: '<%= $openstacktimeout %>'
+          loadbalancer.openstack.org/timeout-member-data: '<%= $openstacktimeout %>'
+<%- } -%>
+      metrics:
+        port: 10254
+        enabled: true
+        service:
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "10254"
+      watchIngressWithoutClass: true
+<%- if $defaultclass != undef { -%>
+      ingressClassResource:
+          default: <%= $defaultclass %>
+<%- } -%>
+<%- if $proxytimeout != undef { -%>
+      config:
+          proxy-read-timeout: "<%= $proxytimeout %>"
+          upstream-keepalive-timeout: "<%= $proxytimeout %>"
+<%- } -%>
+<%- if $customerrors { -%>
+          custom-http-errors: "<%= $customerrors.join(",") %>"
+<%- } -%>
+          limit-req-status-code: "429"
+          limit-conn-status-code: "429"
+<%- if $workertimeout != undef { -%>
+          worker-shutdown-timeout: "<%= $workertimeout %>s"
+<%- } -%>
+<%- if $externalname { -%>
+      extraArgs:
+        publish-status-address: <%= $externalname %>
+<%- } -%>
+    defaultBackend:
+<%- if $defaultbackend { -%>
+      enabled: <%= $defaultbackend %>
+<%- } -%>
+      autoscaling:
+        enabled: false
+      image:
+<%- if $defaultbackendimage { -%>
+        repository: <%= $defaultbackendimage %>
+<%- } -%>
+<%- if $defaultbackendtag { -%>
+        tag: <%= $defaultbackendtag %>
+<%- } -%>
+        readOnlyRootFilesystem: false

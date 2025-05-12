@@ -1,0 +1,26 @@
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - "RequestReceived"
+rules:
+- level: <%= $auditlevel %>
+  verbs: ["update","create","delete","list","get","patch"]
+  resources:
+          - group: ""
+            resources: ["namespaces", "configmaps", "pods", "podtemplates", "secrets", "services", "persistentvolumeclaims", "persistentvolumes", "pods/exec"]
+          - group: "app.k8s.io"
+            resources: ["applications"]
+          - group: "apps"
+            resources: ["daemonsets", "deployments", "replicasets", "statefulsets"]
+          - group: "batch"
+            resources: ["jobs", "cronjobs"]
+          - group: "catalog.cattle.io"
+            resources: ["apps"]
+          - group: "project.cattle.io"
+            resources: ["apps"]
+          - group: "extensions"
+            resources: ["ingresses"]
+          - group: "networking.k8s.io"
+            resources: ["ingresses"]
+- level: None
+  users: ["system:kube-scheduler", "system:kube-controller-manager","system:kube-proxy", "kube-scheduler", "kube-controller-manager","kube-proxy"]
