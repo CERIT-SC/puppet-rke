@@ -12,7 +12,7 @@ class rke::config::main (
      if $rke::node_iface {
        $_ipv4 = $facts["networking"]['interfaces'][$rke::node_iface]['bindings'].map |$_binding| {
          if $rke::node_ip_skip_mask {
-           if ($_binding['netmask'] !~ /255$/) and ($_binding['address'] !~ Regexp($rke::node_ip_skip_mask/)) {
+           if ($_binding['netmask'] !~ /255$/) and ($_binding['address'] !~ Regexp($rke::node_ip_skip_mask)) {
              $_binding['address']
            }
          } else {
