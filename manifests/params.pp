@@ -64,6 +64,11 @@ class rke::params {
 
   $controlplanerequests = false
 
+  $csi_namespace         = 'csi-storage'
+  $csi_create_namespace  = true
+
+  $democratic_manual_values = ['csiDriver.name=org.democratic-csi.node-manual', 'controller.enabled=false', 'driver.config.driver=node-manual', 'driver.config.instance_id=manual', "'driver.config.service.node.capabilities.rpc={STAGE_UNSTAGE_VOLUME}'", 'node.driver.imagePullPolicy=Always', 'csiDriver.attachRequired=false']
+
   $localcsi_version      = '2.0.0'
   $localcsi_namespace    = 'csi-storage'
   $localcsi_localdir     = undef
@@ -121,6 +126,7 @@ class rke::params {
   $nodetype           = undef
 
   $nodeipauto         = true
+  $nodeipskipmask     = undef
   $nodeiface          = undef
   $nodeiface6         = undef
   $nodetaint          = undef

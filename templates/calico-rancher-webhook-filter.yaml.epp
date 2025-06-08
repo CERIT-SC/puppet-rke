@@ -1,0 +1,24 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-k8s
+  namespace: cattle-system
+spec:
+  selector: app == 'rancher-webhook'
+  types:
+    - Ingress
+  ingress:
+    - action: Allow
+      protocol: TCP
+      source:
+        nets:
+<%- $addresses.each |$_addr| { -%>
+<%- if $_addr =~ /:/ { -%>
+          - <%= $_addr %>/128
+<%- } else { -%>
+          - <%= $_addr %>/32
+<%- } -%>
+<%- } -%>
+      destination:
+        selector:
+          app == 'rancher-webhook'

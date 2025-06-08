@@ -3,9 +3,9 @@ define rke::k8sresource::namespace (
   Optional[String] $namespace = undef,
 ){
   if $ensure == present {
-    $exe          = "create namespace ${namespace} ${_context}"
+    $exe          = "create namespace ${namespace}"
     $command      = "/var/lib/rancher/rke2/bin/kubectl ${exe}" 
-    $unless       = "/var/lib/rancher/rke2/bin/kubectl get namespace ${_context}| grep -q ${namespace}"
+    $unless       = "/var/lib/rancher/rke2/bin/kubectl get namespace | grep -q ${namespace}"
   }
 
   # absent

@@ -158,7 +158,7 @@ node-ip: '<%= $nodeip %>'
 <%- } -%>
 <%- if $nodetype =~ /controlplane/ { -%>
 <%- if $controlplanerequests { -%>
-control-plane-resource-requests: "kube-apiserver-memory=3G,etcd-memory=32G"
+control-plane-resource-requests: "<%= $controlplanerequests %>"
 
 <%- } -%>
 <%- } -%>

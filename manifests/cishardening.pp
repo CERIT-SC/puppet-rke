@@ -1,6 +1,7 @@
 class rke::cishardening (
-  Boolean $enable      = $rke::params::cis_enable ,
-  Array   $kubeconfigs = $rke::params::cis_kubeconfigs, 
+  Boolean         $enable          = $rke::params::cis_enable ,
+  Array           $kubeconfigs     = $rke::params::cis_kubeconfigs,
+  Optional[Array] $controlplaneips = undef,    
 ) inherits rke::params {
   if $enable {
     $kubeconfigs.each |String $_config| {
@@ -34,5 +35,20 @@ class rke::cishardening (
       ensure => present,
       value  => 65536,
     }
+
+    if $controlplaneips != undef and $rke::cni =~ /calico/ {
+        file{'/var/lib/rancher/rke2/server/manifests/calico-rancher-webhook-filter.yaml':
+           ensure  => file,
+           content => epp('rke/calico-rancher-webhook-filter.yaml', {ips => $controlplaneips}),
+        }
+    }
+
+    if $rke::cni =~ /cilium/ {
+        file{'/var/lib/rancher/rke2/server/manifests/cilium-rancher-webhook-filter.yaml':
+           ensure  => file,
+           content => epp('rke/cilium-rancher-webhook-filter.yaml', {}),
+        }
+    } 
+
   }
 }
