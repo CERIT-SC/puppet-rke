@@ -61,6 +61,10 @@ class rke::addon::cilium (
         mode    => '0600',
       }
     }
+
+    if $hostfirewall {
+       contain rke::addon::cilium::firewall
+     }
   } else {
     file{'/var/lib/rancher/rke2/server/manifests/rke2-cilium-config.yaml':
       ensure => absent,

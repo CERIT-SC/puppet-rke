@@ -1,0 +1,56 @@
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "allow-intracluster"
+spec:
+  description: "Allow Intra Cluster"
+  nodeSelector: {}
+  ingress:
+  - fromEntities:
+    - cluster
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "allow-icmp"
+spec:
+  description: "Allow icmp"
+  nodeSelector: {}
+  ingress:
+  - icmps:
+    - fields:
+      - type: EchoRequest
+        family: IPv4
+      - type: EchoRequest
+        family: IPv6
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "allow-ssh"
+spec:
+  description: "Allow ssh"
+  nodeSelector: {}
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "22"
+        protocol: TCP
+---
+<%- if $zabbixserver { -%>
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "allow-zabbix"
+spec:
+  description: "Allow Zabbix"
+  nodeSelector: {}
+  ingress:
+  - fromCIDR:
+    - <%= $zabbixserver -%>/32
+    toPorts:
+    - ports:
+      - port: "10050"
+        protocol: TCP
+<%- } -%>

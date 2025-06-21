@@ -1,0 +1,11 @@
+<%- | String $name, Array[String] $ranges, String $namespace | -%>
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: <%= $name %>
+  namespace: <%= $namespace %>
+spec:
+  addresses:
+<% $ranges.each |$range| { -%>
+  - <%= $range %>
+<% } -%>

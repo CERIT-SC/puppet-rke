@@ -1,0 +1,308 @@
+---
+#bgp.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: bgp-deny
+spec:
+  order: 10
+  applyOnForward: true
+  egress:
+    - action: Deny
+      protocol: TCP
+      source:
+        nets:
+<%- split($clustercidr, ",").each |$_cidr| { -%>
+        - <%= $_cidr %>
+<%- } -%>
+      destination:
+        nets:
+<%- $bgppeers.each |$_peer| { -%>
+<%- if $_peer =~ /:/ { -%>
+        - "<%= $_peer %>/128"
+<%- } else { -%>
+        - "<%= $_peer %>/32"
+<%- } -%>
+<%- } -%>
+        ports:
+        - 179
+  selector: has(host-endpoint)
+---
+#egress.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-outbound-external
+spec:
+  order: 20
+  applyOnForward: true
+  egress:
+    - action: Allow
+  selector: has(host-endpoint)
+---
+#etcd.yaml
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-etcd
+spec:
+  order: 10
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+      - 127.0.0.1/32
+      - ::1/128
+<%- $localcidrs.each |$_cidr| { -%>
+      - <%= $_cidr %>
+<%- } -%> 
+    destination:
+      ports:
+      - 2379
+      - 2380
+      - 2381
+  selector: has(host-endpoint)
+---
+#icmp.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-ping
+spec:
+  order: 12
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+    - action: Allow
+      protocol: ICMP
+    - action: Allow
+      protocol: ICMPv6
+  selector: has(host-endpoint)
+---
+#intracluster.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-intracluster
+spec:
+  order: 10
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+        - 169.254.20.10
+<%- split($clustercidr, ",").each |$_cidr| { -%>
+        - <%= $_cidr %>
+<%- } -%>
+  - action: Allow
+    protocol: UDP
+    source:
+      nets:
+        - 169.254.20.10
+<%- split($clustercidr, ",").each |$_cidr| { -%>
+        - <%= $_cidr %>
+<%- } -%>
+  selector: has(host-endpoint)
+---
+#kube-internal.yaml
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-kube-internal
+spec:
+  order: 10
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+      - 127.0.0.1/32
+      - ::1/128
+<%- $localcidrs.each |$_cidr| { -%>
+      - <%= $_cidr %>
+<%- } -%>
+    destination:
+      ports:
+      - 179   # internal bgp
+      - 2112  # kube-vip 
+      - 5473  # calico-typha
+      - 6443  # kubeapi
+      - 8003  # beegfs storage
+      - 8005  # beegfs metadata
+      - 8008  # beegfs mgmtd
+      - 9796  # rancher node exporter
+      - 10250 # kubelet
+      - 10259 # scheduler
+      - 12345 # gpu scheduler
+  selector: has(host-endpoint)
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-kube-hostns-internal
+spec:
+  order: 10
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+      - 169.254.20.10
+<%- $localcidrs.each |$_cidr| { -%>
+      - <%= $_cidr %>
+<%- } -%>
+    destination:
+      nets:
+        - 169.254.20.10
+<%- split($clustercidr, ",").each |$_cidr| { -%>
+        - <%= $_cidr %>
+<%- } -%>
+  - action: Allow
+    protocol: UDP
+    source:
+      nets:
+      - 169.254.20.10
+<%- $localcidrs.each |$_cidr| { -%>
+      - <%= $_cidr %>
+<%- } -%>
+    destination:
+      nets:
+        - 169.254.20.10
+<%- split($clustercidr, ",").each |$_cidr| { -%>
+        - <%= $_cidr %>
+<%- } -%>
+  selector: has(host-endpoint)
+---
+#loadbalacers.yaml
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: enable-loadbalancers
+spec:
+  order: 98
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      nets:
+<%- $lbpools.each |$_pool| { -%>
+      - '<%= $_pool -%>'
+<%- } -%>
+<%- if $lbsrcnets { -%>
+    source:
+      nets:
+<%- $lbsrcnets.each |$_net| { -%>
+      - '<%= $_net -%>'
+<%- } -%>
+<%- } -%>
+  - action: Allow
+    protocol: UDP
+    destination:
+      nets:
+<%- $lbpools.each |$_pool| { -%>
+      - '<%= $_pool -%>'
+<%- } -%>
+<%- if $lbsrcnets { -%>
+    source:
+      nets:
+<%- $lbsrcnets.each |$_net| { -%>
+      - '<%= $_net -%>'
+<%- } -%>
+<%- } -%>
+  selector: has(host-endpoint)
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: enable-ssh-access
+spec:
+  order: 99
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      nets:
+<%- $localcidrs.each |$_cidr| { -%>
+      - <%= $_cidr %>
+<%- } -%>
+      ports:
+      - '22'
+  selector: has(host-endpoint)
+---
+#nodeports.yaml
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: disable-nodeports
+spec:
+  order: 99
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Deny
+    protocol: TCP
+    destination:
+      ports:
+      - '30000:32767'
+  selector: has(host-endpoint)
+---
+#rke.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-rke2
+spec:
+  order: 10
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+<%- $localcidrs.each |$_cidr| { -%>
+      - <%= $_cidr %>
+<%- } -%>
+    destination:
+      ports:
+      - 9345
+  selector: has(host-endpoint)
+---
+<%- if $zabbixserver { -%>
+#zabbix.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: zabbix
+spec:
+  order: 16
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+    - action: Allow
+      protocol: TCP
+      source:
+        nets: ['<%= $zabbixserver %>/32']
+      destination:
+        ports:
+        - 10050
+  selector: has(host-endpoint)
+<%- } -%>

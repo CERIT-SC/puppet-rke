@@ -1,0 +1,38 @@
+<%- | String $name, Array[Hash] $exports = [], Array[Hash] $imports = [] | -%>
+apiVersion: crd.projectcalico.org/v1
+kind: BGPFilter
+metadata:
+  name: <%= $name %>
+spec:
+<%- $exports.filter |$e| { $e['cidr'] =~ '^\\d+\\.\\d+\\.\\d+\\.\\d+/' }.each |$entry| { -%>
+<%- if $exports.filter |$e| { $e['cidr'] =~ '^\\d+\\.\\d+\\.\\d+\\.\\d+/' }.index($entry) == 0 { -%>
+  exportV4:
+<%- } -%>
+    - action: <%= $entry['type'].capitalize %>
+      matchOperator: In
+      cidr: <%= $entry['cidr'] %>
+<%- } -%>
+<%- $exports.filter |$e| { $e['cidr'] =~ ':' } .each |$entry| { -%>
+<%- if $exports.filter |$e| { $e['cidr'] =~ ':' }.index($entry) == 0 { -%>
+  exportV6:
+<%- } -%>
+    - action: <%= $entry['type'].capitalize %>
+      matchOperator: In
+      cidr: <%= $entry['cidr'] %>
+<%- } -%>
+<%- $imports.filter |$e| { $e['cidr'] =~ '^\\d+\\.\\d+\\.\\d+\\.\\d+/' }.each |$entry| { -%>
+<%- if $imports.filter |$e| { $e['cidr'] =~ '^\\d+\\.\\d+\\.\\d+\\.\\d+/' }.index($entry) == 0 { -%>
+  importV4:
+<%- } -%>
+    - action: <%= $entry['type'].capitalize %>
+      matchOperator: In
+      cidr: <%= $entry['cidr'] %>
+<%- } -%>
+<%- $imports.filter |$e| { $e['cidr'] =~ ':' } .each |$entry| { -%>
+<%- if $imports.filter |$e| { $e['cidr'] =~ ':' }.index($entry) == 0 { -%>
+  importV6:
+<%- } -%>
+    - action: <%= $entry['type'].capitalize %>
+      matchOperator: In
+      cidr: <%= $entry['cidr'] %>
+<%- } -%>

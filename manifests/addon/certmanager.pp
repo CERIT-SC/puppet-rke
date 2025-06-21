@@ -46,27 +46,29 @@ class rke::addon::certmanager (
     }
 
     if $rke::config::dns_secret {
-        rke::k8sresource::deploy {'letsencrypt-dns-secret':
-          filename => '/var/lib/rancher/rke2/server/values/dns-secret-le.yaml',
+        file{'/var/lib/rancher/rke2/server/manifests/dns-secret-le.yaml':
+          ensure   => file,
           content  => epp('rke/dns-secret.yaml', {'name' => 'tsig-secret', 'namespace' => $namespace, 'key' => $rke::config::dns_secret}),
+          mode     => '0600',
         }
     }
 
     if $cluster_issuers {
        $cluster_issuers.each |$_issuer| {
-          rke::k8sresource::deploy {"le-clusterissuer-${_issuer['name']}":
-            filename => "/var/lib/rancher/rke2/server/values/le-clusterissuer-${_issuer['name']}",
-            content  => epp('rke/le-clusterissuer.yaml', {'dnsissuer'    => $_issuer['name'],
-                                                          'email'        => $_issuer['email'],
-                                                          'secretref'    => $_issuer['name'],
-                                                          'serverurl'    => $_issuer['url'],
-                                                          'nameserver'   => $_issuer['nameserver'],
-                                                          'keyalgo'      => $_issuer['keyalgo'],
-                                                          'keyname'      => $_issuer['keyname'],
-                                                          'tsigsecret'   => 'tsig-secret',
-                                                          'domain'       => $_issuer['domain'],
-                                                          'ingressclass' => $_issuer['ingressclass'],
-                                                         }),
+            file{"/var/lib/rancher/rke2/server/manifests/le-clusterissuer-${_issuer['name']}.yaml":
+              ensure   => file,
+              content  => epp('rke/le-clusterissuer.yaml', {'dnsissuer'    => $_issuer['name'],
+                                                            'email'        => $_issuer['email'],
+                                                            'secretref'    => $_issuer['name'],
+                                                            'serverurl'    => $_issuer['url'],
+                                                            'nameserver'   => $_issuer['nameserver'],
+                                                            'keyalgo'      => $_issuer['keyalgo'],
+                                                            'keyname'      => $_issuer['keyname'],
+                                                            'tsigsecret'   => 'tsig-secret',
+                                                            'domain'       => $_issuer['domain'],
+                                                            'ingressclass' => $_issuer['ingressclass'],
+                                                           }),
+              mode     => '0600',
           }
        }
     }

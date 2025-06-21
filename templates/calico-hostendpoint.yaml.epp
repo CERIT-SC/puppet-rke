@@ -1,0 +1,9 @@
+apiVersion: crd.projectcalico.org/v1
+kind: HostEndpoint
+metadata:
+  name: <%= regsubst("$hostname-$interface", '\.', '-', 'G') %>
+  labels:
+    host-endpoint: 'true'
+spec:
+  interfaceName: <%= $interface %>
+  node: <%= $hostname %>

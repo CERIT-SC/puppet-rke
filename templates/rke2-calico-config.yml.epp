@@ -1,0 +1,44 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-calico
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    installation:
+      calicoNetwork:
+<%- if $mtu { -%>
+        mtu: <%= $mtu %>
+<%- } -%>
+        bgp: <%= $bgp %>
+<%- if $interface6 != $interface4 { -%>
+<%- if $interface4 { -%>       
+        nodeAddressAutodetectionV4:
+          interface: <%= $interface4 %>
+<%- } -%>
+<%- if $interface6 { -%>
+        nodeAddressAutodetectionV6:
+          interface: <%= $interface6 %>
+<%- } -%>
+<%- } -%>
+        ipPools:
+        - blockSize: 24
+          cidr: 10.42.0.0/16
+          encapsulation: <%= $encapsulation %>
+          natOutgoing: Enabled
+<%- if $ipv6pool { -%>
+        - blockSize: 116
+          cidr: <%= $ipv6pool %>
+          encapsulation: <%= $encapsulation %>
+          natOutgoing: Enabled
+<%- } -%>
+    felixConfiguration:
+      featureDetectOverride: ""
+<%- if $enablewireguard { -%>
+      wireguardEnabled: true
+      wireguardEnabledV6: true
+<%- } -%>
+<%- if $enablefailsafe == false { -%>
+      failsafeInboundHostPorts: []
+      failsafeOutboundHostPorts: []
+<%- } -%>

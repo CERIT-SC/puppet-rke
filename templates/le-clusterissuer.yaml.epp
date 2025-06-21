@@ -5,6 +5,7 @@ metadata:
     name: <%= $dnsissuer %>
   name: <%= $dnsissuer %>
 spec:
+<%- if $nameserver or $ingressclass { -%>
   acme:
     email: <%= $email %>
     preferredChain: ""
@@ -34,4 +35,7 @@ spec:
         ingress:
           class: <%= $ingressclass %>
           serviceType: ClusterIP 
+<%- } -%>
+<%- } else { -%>
+  selfSigned: {}
 <%- } -%>

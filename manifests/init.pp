@@ -41,6 +41,7 @@ class rke (
   Optional[String]        $static_cpu_policy       = $rke::params::staticcpupolicy,
   Optional[Integer]       $static_reserved_cpus    = $rke::params::staticreservedcpus,
   Boolean                 $tls_security            = $rke::params::tlssecurity,
+  Boolean                 $controlnode             = $rke::params::controlnode,
 ) inherits rke::params {
   
   contain rke::install

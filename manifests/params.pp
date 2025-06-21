@@ -7,6 +7,23 @@ class rke::params {
   $audit_level        = 'Metadata'
   $autostart          = false
 
+  $calico_bgp                   = 'Enabled'
+  $calico_bgpfilter             = undef
+  $calico_bgpfilterimports      = undef
+  $calico_bgpnexthop            = false
+  $calico_bgppeers              = undef
+  $calico_enablefailsafe        = true
+  $calico_enablefirewall        = false
+  $calico_enablewireguard       = false
+  $calico_encapsulation         = 'none'    
+  $calico_hostendpoints         = false
+  $calico_lbsrccidrs            = undef
+  $calico_bgplocalasn           = undef
+  $calico_localcidrs            = undef
+  $calico_mtu                   = undef
+  $calico_ippools               = undef
+
+
   $certman_version        = undef
   $certman_nameservers    = undef
   $certman_namespace      = 'cert-manager'
@@ -55,6 +72,8 @@ class rke::params {
                          '/var/lib/rancher/rke2/server/tls/serving-kube-apiserver.crt',
                         ]
   $cisprofile         = 'cis'
+
+  $controlnode        = false
 
   $cni                = 'calico'
 
@@ -121,6 +140,10 @@ class rke::params {
   $kubevip_nodeselector  = undef
   $kubevip_image_version = undef
 
+  $metallb_namespace  = 'metallb'
+  $metallb_values     = ['controller.securityContext.runAsNonRoot=true', 'controller.securityContext.runAsUser=65534', 'controller.securityContext.runAsGroup=65534', 'controller.securityContext.fsGroup=65534', 'controller.securityContext.seccompProfile.type=RuntimeDefault', 'speaker.enabled=false']
+  $metallb_version    = '0.15.2'
+
   $nodelabels         = undef
   $nodemaxpods        = undef
   $nodetype           = undef
@@ -164,7 +187,7 @@ class rke::params {
   $rkeingress_enabled             = true
   $rkeingress_ipv4                = undef
   $rkeingress_ipv6                = undef
-  $rkeingress_ipannotation        = 'metallb.universe.tf/loadBalancerIPs'
+  $rkeingress_ipannotation        = 'metallb.io/loadBalancerIPs'
   $rkeingress_externaltraffic     = 'Local'
   $rkeingress_cpu                 = '2'
   $rkeingress_memory              = '2200Mi'
