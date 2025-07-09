@@ -11,8 +11,10 @@ class rke::config (
 
    contain rke::config::registries
    contain rke::config::proxyenv
-   contain rke::config::pss
-   contain rke::config::audit
+   if $rke::node_type =~ /controlplane/ {
+     contain rke::config::pss
+     contain rke::config::audit
+   }
    contain rke::config::boot
    contain rke::config::main
 }

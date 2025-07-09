@@ -1,0 +1,87 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: external-dns
+  namespace: <%= $namespace %>
+rules:
+  - apiGroups: [""]
+    resources: ["services","endpoints","pods"]
+    verbs: ["get","watch","list"]
+  - apiGroups: ["extensions","networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get","watch","list"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list","watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-dns
+  namespace: <%= $namespace %>
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: external-dns-viewer
+  namespace: <%= $namespace %>
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-dns
+subjects:
+- kind: ServiceAccount
+  name: external-dns
+  namespace: <%= $namespace %>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: <%= $namespace %>
+spec:
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: external-dns
+        image: registry.k8s.io/external-dns/external-dns:<%= $version %>
+        args:
+        - --registry=txt
+        - --txt-prefix=external-dns-
+        - --txt-owner-id=k8s<%= $tagsuffix %>
+        - --provider=rfc2136
+        - --rfc2136-host=<%= $dnsserver %>
+        - --rfc2136-port=53
+        - --rfc2136-zone=<%= $domain %>
+        - --rfc2136-tsig-secret-alg=<%= $key %>
+        - --rfc2136-tsig-keyname=<%= $keyname %>
+        - --rfc2136-tsig-axfr
+        - --source=service
+        - --source=ingress
+        - --domain-filter=<%= $domainfilter %>
+        - --events
+        - --log-level=info
+        env:
+        - name: EXTERNAL_DNS_RFC2136_TSIG_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: key
+              name: <%= $dnssecret %>
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 65532
+          runAsGroup: 65532
+          capabilities:
+            drop:
+            - ALL

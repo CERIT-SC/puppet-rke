@@ -130,7 +130,7 @@ class rke::config::main (
        $_kaburst = undef
     }
 
-    if $rke::static_cpu_policy and $tesk::rke2::static_cpu_policy == 'true' {
+    if $rke::static_cpu_policy and $rke::static_cpu_policy == 'true' {
        $_kubeletargs = delete_undef_values(flatten([$_reservecpu, $_mpods, $_kaqps, $_kaburst, $rke::kubelet_args, "cpu-manager-policy=static", "topology-manager-policy=best-effort"]))
     } else {
        $_kubeletargs = delete_undef_values(flatten([$_reservecpu, $_mpods, $_kaqps, $_kaburst, $rke::kubelet_args]))
@@ -162,6 +162,7 @@ class rke::config::main (
                                                      'etcds3secretkey'      => $rke::etcd_s3_secretkey,
                                                      'etcds3endpoint'       => $rke::etcd_s3_endpoint,
                                                      'etcds3path'           => $rke::etcd_s3_path,
+                                                     'etcdarg'              => "quota-backend-bytes=${rke::etcd_quota_backend}",
                                                      'kubeconfig'           => $rke::config::kubelet_config_file,
                                                      'tlssecurity'          => $rke::tls_security,
                                                      'kubeletfgates'        => $rke::kubelet_gates,

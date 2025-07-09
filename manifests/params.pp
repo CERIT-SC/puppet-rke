@@ -73,6 +73,8 @@ class rke::params {
                         ]
   $cisprofile         = 'cis'
 
+  $containerd_enabled = true
+
   $controlnode        = false
 
   $cni                = 'calico'
@@ -113,6 +115,19 @@ class rke::params {
   $etcds3secretkey    = undef
   $etcds3endpoint     = undef
   $etcds3path         = undef
+  $etcdquotabackend   = 4294967296 # 4GB, default is 2GB
+
+  $etcdcleanup_enabled = true
+
+  $externaldns_dnssecret    = undef
+  $externaldns_namespace    = 'external-dns'
+  $externaldns_server       = undef
+  $externaldns_domain       = undef
+  $externaldns_keyalgo      = undef
+  $externaldns_keyname      = undef
+  $externaldns_domainfilter = undef
+  $externaldns_imageversion = 'v0.17.0'
+  $externaldns_tag          = undef
 
   $graceperiod         = 30
   $graceperiodcritical = 20

@@ -110,6 +110,9 @@ etcd-s3-folder: <%= regsubst($etcds3path, '^.*/', '') %>
 <%- } -%>
 etcd-snapshot-schedule-cron: '0 */6 * * *'
 etcd-snapshot-retention: 10
+<%- if $etcdarg { -%>
+etcd-arg: <%= $etcdarg %>
+<%- } -%>
 
 <%- } -%>
 <%- if $labels != undef { -%>

@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: deny-bgp-to-non-kube-system-pods
+spec:
+  endpointSelector:
+    matchExpressions:
+    - key: k8s:io.kubernetes.pod.namespace
+      operator: NotIn
+      values:
+      - kube-system
+  enableDefaultDeny:
+    egress: false
+  egressDeny:
+  - toCIDR:
+    - 192.0.2.0/24
+    toPorts:
+    - ports:
+      - protocol: TCP
+        port: "179"

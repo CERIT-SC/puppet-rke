@@ -11,6 +11,7 @@ class rke (
   Optional[String]        $etcd_s3_secretkey       = $rke::params::etcds3secretkey,
   Optional[String]        $etcd_s3_endpoint        = $rke::params::etcds3endpoint,
   Optional[String]        $etcd_s3_path            = $rke::params::etcds3path,
+  Optional[Integer]       $etcd_quota_backend      = $rke::params::etcdquotabackend,
   Boolean                 $internal_ingress        = $rke::params::internalingress,
   Optional[String]        $kubelet_gates           = $rke::params::kubeletgates,
   Optional[Integer]       $kubeapi_burst           = $rke::params::kubeapiburst,
@@ -39,7 +40,7 @@ class rke (
   String                  $service_cidr            = $rke::params::servicecidr,
   String                  $server_addr             = $rke::params::serveraddr,
   Optional[String]        $static_cpu_policy       = $rke::params::staticcpupolicy,
-  Optional[Integer]       $static_reserved_cpus    = $rke::params::staticreservedcpus,
+  Optional[String]        $static_reserved_cpus    = $rke::params::staticreservedcpus,
   Boolean                 $tls_security            = $rke::params::tlssecurity,
   Boolean                 $controlnode             = $rke::params::controlnode,
 ) inherits rke::params {

@@ -39,7 +39,9 @@ spec:
         type: LoadBalancer
 <%- if $ipfamilies =~ Array { -%>
         ipFamilies: ["<%= $ipfamilies.join('","') %>"]
+<%- if $ipfamilies.length > 1 { -%>
         ipFamilyPolicy: RequireDualStack
+<%- } -%>
 <%- } -%>
 <%- if $ipfamilies =~ String { -%>
         ipFamilies: ["<%= $ipfamilies %>"]
