@@ -10,8 +10,8 @@ class rke::addon::containerd (
           $_eicr =  $rke::registries['eicr.vm.cesnet.cz']
 
           exec{'ensure /var/lib/rancher/rke2/agent/etc/containerd':
-            command => 'mkdir -p /var/lib/rancher/rke2/agent/etc/containerd',
-            unless  => 'test -d /var/lib/rancher/rke2/agent/etc/containerd',
+            command => '/bin/mkdir -p /var/lib/rancher/rke2/agent/etc/containerd',
+            unless  => '/bin/test -d /var/lib/rancher/rke2/agent/etc/containerd',
           }
 
           file{'/var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.tmpl':

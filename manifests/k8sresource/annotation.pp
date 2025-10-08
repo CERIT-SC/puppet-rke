@@ -18,7 +18,7 @@ define rke::k8sresource::annotation (
           command     =>  $command,
         }
       } else {
-        $command = "kubectl ${exe} --namespace=${namespace} ${splitted[0]}- > /dev/null ; kubectl ${exe} --namespace=${namespace} ${annotation}"
+        $command = "/var/lib/rancher/rke2/bin/kubectl ${exe} --namespace=${namespace} ${splitted[0]}- > /dev/null ; kubectl ${exe} --namespace=${namespace} ${annotation}"
         exec {"${annotation} ${exe}":
           command     => $command,
           environment => ['KUBECONFIG=/etc/rancher/rke2/rke2.yaml'],

@@ -4,8 +4,8 @@ class rke::config::main (
 
    $_configdir = dirname($file)
    exec {'mkdir-config':
-      command => "mkdir -p ${_configdir}",
-      unless  => "test -d ${_configdir}",
+      command => "/bin/mkdir -p ${_configdir}",
+      unless  => "/bin/test -d ${_configdir}",
    }
 
    if defined(Package['rke2']) {

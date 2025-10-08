@@ -6,8 +6,8 @@ class rke::cishardening (
   if $enable {
     $kubeconfigs.each |String $_config| {
       exec{$_config:
-        command => "chmod 0600 \"$_config\"",
-        onlyif  => "test -f \"$_config\" && stat -c %a \"$_config\" | grep -q '6[^0][^0]'",
+        command => "/bin/chmod 0600 \"$_config\"",
+        onlyif  => "/bin/test -f \"$_config\" && stat -c %a \"$_config\" | grep -q '6[^0][^0]'",
       }
     }
 

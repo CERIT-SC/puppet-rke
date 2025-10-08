@@ -29,7 +29,7 @@ class rke::config::boot (
         ensure  => file,
         content => epp('rke/k8s-preboot.service', {}),
       } ~> exec{'reload-k8spreboot':
-        command     => 'systemctl daemon-reload',
+        command     => '/bin/systemctl daemon-reload',
         refreshonly => true,
       }
       service{'k8s-preboot':
