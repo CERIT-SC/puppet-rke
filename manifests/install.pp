@@ -18,6 +18,10 @@ class rke::install (
      }
    }
 
+   file{'/var/lib/rancher':
+     ensure => directory,
+   }
+
    file{'/var/lib/rancher/rke2':
      ensure => directory,
    }
