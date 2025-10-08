@@ -11,6 +11,7 @@ class rke::params {
   $calico_bgpfilter             = undef
   $calico_bgpfilterimports      = undef
   $calico_bgpnexthop            = false
+  $calico_bgppassword           = undef
   $calico_bgppeers              = undef
   $calico_enablefailsafe        = true
   $calico_enablefirewall        = false
@@ -77,6 +78,8 @@ class rke::params {
 
   $controlnode        = false
 
+  $criu_enabled       = true
+
   $cni                = 'calico'
 
   $clustercidr        = '10.42.0.0/16'
@@ -139,10 +142,10 @@ class rke::params {
 
   $k8spreboot         = true
 
-  $controllergates    = 'InPlacePodVerticalScaling=true'
-  $kubeletgates       = 'InPlacePodVerticalScaling=true'
-  $kubeapigates       = 'InPlacePodVerticalScaling=true'
-  $schedulergates     = 'InPlacePodVerticalScaling=true'
+  $controllergates    = 'InPlacePodVerticalScalingExclusiveCPUs=true'
+  $kubeletgates       = 'InPlacePodVerticalScalingExclusiveCPUs=true'
+  $kubeapigates       = 'InPlacePodVerticalScalingExclusiveCPUs=true'
+  $schedulergates     = 'InPlacePodVerticalScalingExclusiveCPUs=true'
 
   $kubeapiburst       = 100
   $kubeapiqps         = 100
@@ -204,18 +207,23 @@ class rke::params {
   $rkeingress_ipv6                = undef
   $rkeingress_ipannotation        = 'metallb.io/loadBalancerIPs'
   $rkeingress_externaltraffic     = 'Local'
-  $rkeingress_cpu                 = '2'
+  $rkeingress_cpu                 = '1'
+  $rkeingress_cpulimit            = undef
   $rkeingress_memory              = '2200Mi'
   $rkeingress_externalname        = undef
   $rkeingress_maxreplicas         = undef
   $rkeingress_openstacktimeout    = undef
   $rkeingress_defaultclass        = true
   $rkeingress_proxytimeout        = 1200
+  $rkeingress_replicas            = undef
   $rkeingress_customerrors        = [500, 503]
   $rkeingress_workertimeout       = 7200
   $rkeingress_defaultbackend      = true
   $rkeingress_defaultbackendimage = undef
   $rkeingress_defaultbackendtag   = undef
+  $rkeingress_repository          = undef
+  $rkeingress_tag                 = undef
+  $rkeingress_underscores         = undef
   
   $schedulerextenders = undef
   $schedulerpolicy    = undef

@@ -1,0 +1,5 @@
+tcp-close
+log-file=/tmp/criu.log
+timeout=10000
+file-locks
+link-remap

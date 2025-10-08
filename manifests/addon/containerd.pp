@@ -4,21 +4,28 @@ class rke::addon::containerd (
     if $enabled {
       contain rke
 
-      $_cerit = $rke::registries['cerit.io']
-      $_eicr =  $rke::registries['eicr.vm.cesnet.cz']
+      if $facts['nvidiatoolkit'] == 'present' {
 
-      exec{'ensure /var/lib/rancher/rke2/agent/etc/containerd':
-        command => 'mkdir -p /var/lib/rancher/rke2/agent/etc/containerd',
-        unless  => 'test -d /var/lib/rancher/rke2/agent/etc/containerd',
-      }
+          $_cerit = $rke::registries['cerit.io']
+          $_eicr =  $rke::registries['eicr.vm.cesnet.cz']
 
-      file{'/var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl':
-          ensure    => file,
-          owner     => 'root',
-          mode      => '0600',
-          show_diff => false,
-          content   => epp('rke/config.toml.tmpl', { 'ceritpassword' => $_cerit['password'], 'eicrpassword' => $_eicr['password'] }),
-          require   => Exec['ensure /var/lib/rancher/rke2/agent/etc/containerd'],
+          exec{'ensure /var/lib/rancher/rke2/agent/etc/containerd':
+            command => 'mkdir -p /var/lib/rancher/rke2/agent/etc/containerd',
+            unless  => 'test -d /var/lib/rancher/rke2/agent/etc/containerd',
+          }
+
+          file{'/var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.tmpl':
+             ensure    => file,
+             owner     => 'root',
+             mode      => '0600',
+             show_diff => false,
+             content   => epp('rke/config.toml.tmpl', { 'ceritpassword' => $_cerit['password'], 'eicrpassword' => $_eicr['password'] }),
+             require   => Exec['ensure /var/lib/rancher/rke2/agent/etc/containerd'],
+          }
+      } else {
+          file{'/var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.tmpl':
+              ensure    => absent,
+          }
       }
     }
 }

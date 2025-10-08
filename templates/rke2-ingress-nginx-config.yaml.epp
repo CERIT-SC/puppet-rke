@@ -8,21 +8,35 @@ spec:
   valuesContent: |-
     controller:
       kind: Deployment
+<%- if $repository { -%>
+      image:
+        repository: <%= $repository %>
+<%- if $tag { -%>
+        tag: <%= $tag %>
+<%- } -%>
+<%- } -%>
       extraArgs:
         enable-annotation-validation: true
       hostNetwork: false
       hostPort:
         enabled: false
-<%- if $maxreplicas > 1 { -%>
+<%- if $maxreplicas and $maxreplicas > 1 { -%>
       autoscaling:
         enabled: true
-        minReplicas: 1
+        minReplicas: 2
         maxReplicas: <%= $maxreplicas %>
 <%- } else { -%>
+<%- if $replicas { -%>
+      replicaCount: <%= $replicas %>
+<%- } -%>
       autoscaling:
         enabled: false
 <%- } -%>
       resources:
+<%- if $cpulimit != undef { -%>
+        limits:
+          cpu: <%= $cpulimit %>
+<%- } -%>
         requests:
 <%- if $cpu != undef { -%>
           cpu: <%= $cpu %>
@@ -78,6 +92,9 @@ spec:
 <%- } -%>
           limit-req-status-code: "429"
           limit-conn-status-code: "429"
+<%- if $underscores != undef { -%>
+          enable-underscores-in-headers: <%= $underscores %>
+<%- } -%>
 <%- if $workertimeout != undef { -%>
           worker-shutdown-timeout: "<%= $workertimeout %>s"
 <%- } -%>
@@ -86,7 +103,7 @@ spec:
         publish-status-address: <%= $externalname %>
 <%- } -%>
     defaultBackend:
-<%- if $defaultbackend { -%>
+<%- if $defaultbackend != undef { -%>
       enabled: <%= $defaultbackend %>
 <%- } -%>
       autoscaling:

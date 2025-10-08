@@ -14,6 +14,7 @@ class rke::addon::calico (
    Optional[Array]   $lb_src_cidrs          = $rke::params::calico_lbsrccidrs,
    Optional[Array]   $local_cidrs           = $rke::params::calico_localcidrs,
    Optional[Integer] $mtu                   = $rke::params::calico_mtu,
+   Optional[String]  $bgp_password          = $rke::params::calico_bgppassword,
 ) inherits rke::params {
 
    if $hostendpoints {
@@ -70,14 +71,34 @@ class rke::addon::calico (
             $_id = split($_address, '\.')[3]
          }
          $_name     = "global-${_suffix}-${_id}"
-         epp('rke/calico-peer.yaml.epp', { 'name' => $_name, 'asn' => $_asn, 'address' => $_address, 'keepnexthop' => $bgp_nexthop })
+         if $bgp_password == undef {
+            epp('rke/calico-peer.yaml.epp', { 'name' => $_name, 'asn' => $_asn, 'address' => $_address, 'keepnexthop' => $bgp_nexthop })
+         } else {
+            epp('rke/calico-peer-pw.yaml.epp', { 'name' => $_name, 'asn' => $_asn, 'address' => $_address, 'keepnexthop' => $bgp_nexthop })
+         }
 
        }
 
-       file { "/var/lib/rancher/rke2/server/manifests/calico/bgp-peers.yaml":
+       if $bgp_password == undef {
+         file { "/var/lib/rancher/rke2/server/manifests/calico/bgp-peers.yaml":
            ensure  => file,
            mode    => '0600',
            content => join($_peertmpl, "\n---\n"),
+         }
+       } else {
+         file { "/var/lib/rancher/rke2/server/manifests/calico/bgp-peers-pw.yaml":
+           ensure  => file,
+           mode    => '0600',
+           content => join($_peertmpl, "\n---\n"),
+         }
+       }
+       if $bgp_password != undef {
+         file { '/var/lib/rancher/rke2/server/manifests/calico/bgp-password.yaml':
+           ensure    => file,
+           mode      => '0600',
+           content   => epp('rke/calico-bgp-password.yaml.epp', { 'bgppassword' => $bgp_password }),
+           show_diff => false,
+         }
        }
      }
 

@@ -1,0 +1,13 @@
+<%- |$asn, $address, $name, $keepnexthop| -%>
+apiVersion: crd.projectcalico.org/v1
+kind: BGPPeer
+metadata:
+  name: <%= $name %>
+spec:
+  peerIP: <%= $address %>
+  asNumber: <%= $asn %>
+  keepOriginalNextHop: <%= $keepnexthop %>
+  password:
+    secretKeyRef:
+      name: "bgp-passwords"
+      key: "peer_pw"
