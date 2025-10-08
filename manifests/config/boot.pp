@@ -10,8 +10,8 @@ class rke::config::boot (
       $_dir = dirname($file)
 
       exec{"ensure ${_dir}":
-        command => "mkdir -p ${_dir}",
-        unless  => "test -d ${_dir}",
+        command => "/bin/mkdir -p ${_dir}",
+        unless  => "/bin/test -d ${_dir}",
       }
 
       file{$file:
