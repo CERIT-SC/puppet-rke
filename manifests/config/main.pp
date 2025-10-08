@@ -71,9 +71,9 @@ class rke::config::main (
 
    if $rke::node_type =~ /controlplane/ {
      if $rke::server_addr != $facts['clusterfullname'] {
-       $_tlsnames = [$facts['networking']['fqdn'], $facts['clusterfullname'], $rke::server_addr]
+       $_tlsnames = delete_undef_values([$facts['networking']['fqdn'], $facts['clusterfullname'], $rke::server_addr])
      } else {
-       $_tlsnames = [$facts['networking']['fqdn'], $facts['clusterfullname']]
+       $_tlsnames = delete_undef_values([$facts['networking']['fqdn'], $facts['clusterfullname']])
      }
    } else {
       $_tlsnames = undef
