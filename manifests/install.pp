@@ -6,9 +6,15 @@ class rke::install (
 ) inherits rke::params 
 {
 
-   package_versionlock{'rke2':
-     ensure => $version,
-     locked => true,
+   if defined(Package_version) {
+     package_versionlock{'rke2':
+       ensure => $version,
+       locked => true,
+     }
+   } else {
+     package{'rke2':
+       ensure => $version,
+     }
    }
 
    file{'/var/lib/rancher/rke2':
