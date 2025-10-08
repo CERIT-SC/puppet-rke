@@ -56,7 +56,7 @@ class rke::config::main (
      $_nodeip = undef
    }
 
-   if $rke::token != undef {
+   if $rke::token == undef {
      $_tokens = puppetdb_query("resources{type='Rke::Token' and tag='${rke::server_addr}'}").map |$resource| {
                         $resource['parameters']['clustertoken']
               }
