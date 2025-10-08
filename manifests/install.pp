@@ -57,6 +57,10 @@ class rke::install (
    } 
 
    if $rke::node_type =~ 'controlplane' {
+      file{'/var/lib/rancher/rke2/server/manifests':
+        ensure   => directory,
+      }
+
       if $rke::autostart {
         service{'rke2-server':
           enable  => $rke::autostart,
