@@ -1,7 +1,7 @@
 <%- if $server and $token { -%>
 server: https://<%= $server %>:9345
 <%- } -%>
-<%- if $token != undef { -%>
+<%- if $token != undef and $token != "" { -%>
 token: <%= $token %>
 
 <%- } -%>

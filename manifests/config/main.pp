@@ -56,13 +56,17 @@ class rke::config::main (
      $_nodeip = undef
    }
 
-   $_tokens = puppetdb_query("resources{type='Rke::Token' and tag='${rke::server_addr}'}").map |$resource| {
+   if $rke::token != undef {
+     $_tokens = puppetdb_query("resources{type='Rke::Token' and tag='${rke::server_addr}'}").map |$resource| {
                         $resource['parameters']['clustertoken']
               }
-   if $_tokens != undef {
-      $_token = $_tokens[0]
+     if $_tokens != undef {
+        $_token = $_tokens[0]
+     } else {
+        $_token = undef
+     }
    } else {
-      $_token = undef
+     $_token = $rke::token
    }
 
    if $rke::node_type =~ /controlplane/ {
