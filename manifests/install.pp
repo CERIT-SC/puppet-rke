@@ -1,12 +1,13 @@
 class rke::install (
-    String  $version       = $rke::params::rke2_version,
-    Boolean $etcduser      = $rke::params::etcduser,
-    Boolean $disableubuntu = $rke::params::disableubuntu,
-    Array   $addpackages   = $rke::params::addpackages,
+    String  $version        = $rke::params::rke2_version,
+    Boolean $etcduser       = $rke::params::etcduser,
+    Boolean $disableubuntu  = $rke::params::disableubuntu,
+    Array   $addpackages    = $rke::params::addpackages,
+    Boolean $useversionlock = $rke::params::use_version_lock,
 ) inherits rke::params 
 {
 
-   if defined(Package_version) {
+   if $useversionlock {
      package_versionlock{'rke2':
        ensure => $version,
        locked => true,

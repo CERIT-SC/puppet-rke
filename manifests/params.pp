@@ -237,4 +237,6 @@ class rke::params {
   $staticreservedcpus = undef
 
   $tlssecurity        = true
+
+  $use_version_lock   = true
 }
