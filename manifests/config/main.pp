@@ -8,6 +8,12 @@ class rke::config::main (
       unless  => "test -d ${_configdir}",
    }
 
+   if defined(Package['rke2']) {
+      $_require = Package['rke2']
+   } else {
+      $_require = Package_versionlock['rke2']
+   }
+
    if ! $rke::node_ip_auto {
      if $rke::node_iface {
        $_ipv4 = $facts["networking"]['interfaces'][$rke::node_iface]['bindings'].map |$_binding| {
@@ -170,7 +176,7 @@ class rke::config::main (
                                                      'controllerfgates'     => $rke::controller_gates,
                                                      'schedulerfgates'      => $rke::scheduler_gates,
                                                     }),
-      require   => Package_versionlock['rke2'],
+      require   => $_require,
       show_diff => false,
       mode      => '0600',
    }

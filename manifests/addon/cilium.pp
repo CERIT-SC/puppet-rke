@@ -21,6 +21,12 @@ class rke::addon::cilium (
   contain rke
 
   if $enabled {
+    if defined(Package['rke2']) {
+      $_require = Package['rke2']
+    } else {
+      $_require = Package_versionlock['rke2']
+    }
+
     # Note: if bgpcontrolplane is updated, cilium operator pods need to be restarted
     file{'/var/lib/rancher/rke2/server/manifests/rke2-cilium-config.yaml':
       ensure  => file,
@@ -35,7 +41,7 @@ class rke::addon::cilium (
                                                       'proxyreplacement'      => $proxyreplacement,
                                                       'hostfirewall'          => $hostfirewall,
                                                     }),
-      require => Package_versionlock['rke2'],
+      require => $_require,
       mode    => '0600',
     }
     if $lb_pool_name != undef and $lb_cidrs != undef {
@@ -44,7 +50,7 @@ class rke::addon::cilium (
         content => epp('rke/cilium-lb-ipool.yaml.epp', { 'name'  => $lb_pool_name,
                                                         'cidrs' => $lb_cidrs, 
                                                        }),
-        require => Package_versionlock['rke2'],
+        require => $_require,
         mode    => '0600',
       }
     }
@@ -57,7 +63,7 @@ class rke::addon::cilium (
                                                 'peers'       => $bgp_peers,
                                                 'bgpfamilies' => $bgp_families,
                                               }),
-        require => Package_versionlock['rke2'],
+        require => $_require,
         mode    => '0600',
       }
     }

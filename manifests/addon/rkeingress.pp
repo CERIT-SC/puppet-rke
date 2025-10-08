@@ -25,6 +25,12 @@ class rke::addon::rkeingress (
     contain rke
 
     if $enabled {
+      if defined(Package['rke2']) {
+         $_require = Package['rke2']
+      } else {
+         $_require = Package_versionlock['rke2']
+      }
+
       if $ipv4 {
         $_families4 = "IPv4"
       } else {
@@ -66,7 +72,7 @@ class rke::addon::rkeingress (
                                                                'underscores'         => $underscores,
                                                              }),
         mode    => '0600',
-        require => Package_versionlock['rke2'],
+        require => $_require,
       }
     } else {
       file{'/var/lib/rancher/rke2/server/manifests/rke2-ingress-nginx-config.yaml':

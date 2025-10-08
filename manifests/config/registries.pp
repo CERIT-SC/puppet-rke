@@ -9,12 +9,17 @@ class rke::config::registries (
     } else {
        $_custommirror = undef
     }
+    if defined(Package['rke2']) {
+      $_require = Package['rke2']
+    } else {
+      $_require = Package_versionlock['rke2']
+    }
     file{$file:
         ensure    => file,
         show_diff => false,
         mode      => '0600',
         content   => epp('rke/registries.yaml', { 'registries' => $rke::registries, 'dockermirror' => $rke::reg_dockermirror, 'custommirror' => $_custommirror }),
-        require   => Package_versionlock['rke2'],
+        require   => $_require,
     }
   }
 }
