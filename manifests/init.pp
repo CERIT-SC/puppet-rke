@@ -32,7 +32,7 @@ class rke (
   Optional[Array]         $psa_privileged_ns       = $rke::params::psa_privileged_ns,
   Optional[String]        $reg_dockermirror        = $rke::params::reg_dockermirror,
   Optional[Hash]          $reg_custommirror        = $rke::params::reg_custommirror,
-  Hash                    $registries              = $rke::params::registries,
+  Optional[Hash]          $registries              = $rke::params::registries,
   Optional[String]        $scheduler_gates         = $rke::params::schedulergates,
   Optional[Array]         $scheduler_extenders     = $rke::params::schedulerextenders,
   Optional[String]        $scheduler_policy        = $rke::params::schedulerpolicy,
