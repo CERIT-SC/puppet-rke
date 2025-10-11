@@ -151,6 +151,7 @@ class rke::params {
   $kubeapiqps         = 100
   $kubeletargs        = undef
   $kubeletconfigfile  = '/var/lib/rancher/rke2/agent/etc/kubelet.config'
+  $kubelet_dir        = '/var/lib/kubelet'
 
   $kubevip_iface         = undef
   $kubevip_ip            = undef

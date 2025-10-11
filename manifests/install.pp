@@ -4,6 +4,7 @@ class rke::install (
     Boolean $disableubuntu  = $rke::params::disableubuntu,
     Array   $addpackages    = $rke::params::addpackages,
     Boolean $useversionlock = $rke::params::use_version_lock,
+    String  $kubeletdir     = $rke::params::kubelet_dir,
 ) inherits rke::params 
 {
 
@@ -33,6 +34,16 @@ class rke::install (
    file{'/var/lib/rancher/rke2/server/values':
      ensure => directory,
      mode   => '0700',
+   }
+
+   if $kubeletdir != '/var/lib/kubelet' {
+      file{$kubeletdir:
+        ensure => directory,
+      }
+      file{'/var/lib/kubelet':
+        ensure => link,
+        target => $kubeletdir,
+      }
    }
 
    if $etcduser {
