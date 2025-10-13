@@ -3,7 +3,7 @@ class rke::config::registries (
   String  $file    = $rke::params::rke2_registries,
 ) inherits rke::params {
 
-  if $enabled and $rke::registries and $rke::reg_dockermirror {
+  if $enabled and $rke::registries {
     if $rke::reg_custommirror {
        $_custommirror = regsubst(to_yaml($rke::reg_custommirror, {indentation => 4}), '^---\n', '', 'M')
     } else {
