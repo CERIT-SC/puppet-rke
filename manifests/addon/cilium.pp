@@ -18,6 +18,7 @@ class rke::addon::cilium (
   Optional[Array]   $bgp_families          = $rke::params::cilium_bgpfamilies,
   Optional[Boolean] $hostfirewall          = $rke::params::cilium_hostfirewall,
 ) inherits rke::params {
+  contain rke
 
   if $enabled {
     if defined(Package['rke2']) {
