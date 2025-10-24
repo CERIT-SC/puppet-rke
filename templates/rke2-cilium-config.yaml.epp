@@ -5,6 +5,9 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
+<%- if $devices != undef { -%>
+    devices: "<%= $devices %>
+<%- } -%>
 <%- if $autodirectnoderouters != undef { -%>
     autoDirectNodeRoutes: <%= $autodirectnoderouters %>
 <%- } -%>
