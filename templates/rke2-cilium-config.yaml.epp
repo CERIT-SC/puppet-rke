@@ -6,7 +6,7 @@ metadata:
 spec:
   valuesContent: |-
 <%- if $devices != undef { -%>
-    devices: "<%= $devices %>
+    devices: "<%= $devices %>"
 <%- } -%>
 <%- if $autodirectnoderouters != undef { -%>
     autoDirectNodeRoutes: <%= $autodirectnoderouters %>
