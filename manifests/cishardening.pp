@@ -43,7 +43,7 @@ class rke::cishardening (
         }
     } 
 
-    if $rke::cni =~ /cilium/ {
+    if $rke::cni =~ /cilium/ and $rke::node_type =~ /controlplane/ {
         file{'/var/lib/rancher/rke2/server/manifests/cilium-rancher-webhook-filter.yaml':
            ensure  => file,
            content => epp('rke/cilium-rancher-webhook-filter.yaml', {}),
