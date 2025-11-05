@@ -36,12 +36,12 @@ class rke::cishardening (
       value  => 65536,
     }
 
-    if $controlplaneips != undef and $rke::cni =~ /calico/ {
+    if $controlplaneips != undef and $rke::cni =~ /calico/ and $rke::node_type =~ /controlplane/ {
         file{'/var/lib/rancher/rke2/server/manifests/calico-rancher-webhook-filter.yaml':
            ensure  => file,
            content => epp('rke/calico-rancher-webhook-filter.yaml', {ips => $controlplaneips}),
         }
-    }
+    } 
 
     if $rke::cni =~ /cilium/ {
         file{'/var/lib/rancher/rke2/server/manifests/cilium-rancher-webhook-filter.yaml':
