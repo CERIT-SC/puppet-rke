@@ -20,10 +20,10 @@ class rke::addon::certmanager (
         url               => 'https://charts.jetstack.io',
     }
 
-    $_noproxy = regsubst($rke::no_proxy, ',', '\\,', 'G')
     $_nameservers = $nameservers.join('\,')
 
     if $rke::http_proxy {
+        $_noproxy = regsubst($rke::no_proxy, ',', '\\,', 'G')
         $_set = concat(['crds.enabled=true', "'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=$_nameservers,--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false'], 
                         "http_proxy=${rke::http_proxy}", "https_proxy=${rke::http_proxy}", "'no_proxy=${_noproxy}'")
     } else {
