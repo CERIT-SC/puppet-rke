@@ -43,6 +43,7 @@ class rke (
   Optional[String]        $static_reserved_cpus    = $rke::params::staticreservedcpus,
   Boolean                 $tls_security            = $rke::params::tlssecurity,
   Boolean                 $controlnode             = $rke::params::controlnode,
+  Optional[String]        $ingresscontroller       = $rke::params::ingresscontroller,
   Optional[String]        $token                   = undef,
 ) inherits rke::params {
   

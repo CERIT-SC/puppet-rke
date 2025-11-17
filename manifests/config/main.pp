@@ -179,6 +179,7 @@ class rke::config::main (
                                                      'kubeapifgates'        => $rke::kubeapi_gates,
                                                      'controllerfgates'     => $rke::controller_gates,
                                                      'schedulerfgates'      => $rke::scheduler_gates,
+                                                     'ingresscontroller'    => $rke::ingresscontroller,
                                                     }),
       require   => $_require,
       show_diff => false,

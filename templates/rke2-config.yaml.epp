@@ -173,4 +173,7 @@ disable-kube-proxy: true
 <%- if $psaconfig { -%>
 pod-security-admission-config-file: <%= $psaconfig %>
 <%- } -%>
+<%- if $ingresscontroller { -%>
+ingress-controller: <%= $ingresscontroller %>
+<%- } -%>
 <%- } -%>
