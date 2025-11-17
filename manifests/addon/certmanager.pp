@@ -20,14 +20,19 @@ class rke::addon::certmanager (
         url               => 'https://charts.jetstack.io',
     }
 
-    $_nameservers = $nameservers.join('\,')
+    if $nameservers {
+        $_nameservers = $nameservers.join('\,')
+        $_nameservers_arg = "--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=${_nameservers},"
+    } else {
+        $_nameservers_arg = ""
+    }
 
     if $rke::http_proxy {
         $_noproxy = regsubst($rke::no_proxy, ',', '\\,', 'G')
-        $_set = concat(['crds.enabled=true', "'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=$_nameservers,--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false'], 
+        $_set = concat(['crds.enabled=true', "'extraArgs={${_nameservers_arg}--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false'],
                         "http_proxy=${rke::http_proxy}", "https_proxy=${rke::http_proxy}", "'no_proxy=${_noproxy}'")
     } else {
-        $_set = ['crds.enabled=true', "'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=$_nameservers,--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false']
+        $_set = ['crds.enabled=true', "'extraArgs={${_nameservers_arg}--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false']
     }
 
     helm::chart {"cert-manager":
