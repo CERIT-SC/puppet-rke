@@ -18,7 +18,7 @@ class rke::addon::cilium (
   Optional[Array]   $bgp_families          = $rke::params::cilium_bgpfamilies,
   Optional[Boolean] $hostfirewall          = $rke::params::cilium_hostfirewall,
   Optional[String]  $devices               = $rke::params::cilium_devices,
-  Optional[Boolean] $lbExternalclusterip   = $rke::params::cilium_lbExternalclusterip,
+  Optional[Boolean] $lbexternalclusterip   = $rke::params::cilium_lbexternalclusterip,
 ) inherits rke::params {
   contain rke
 
@@ -43,7 +43,7 @@ class rke::addon::cilium (
                                                       'proxyreplacement'      => $proxyreplacement,
                                                       'hostfirewall'          => $hostfirewall,
                                                       'devices'               => $devices,
-                                                      'lbExternalclusterip'   => $lbExternalclusterip,
+                                                      'lbExternalClusterIP'   => $lbexternalclusterip,
                                                     }),
       require => $_require,
       mode    => '0600',
