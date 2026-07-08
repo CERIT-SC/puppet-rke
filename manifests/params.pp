@@ -24,12 +24,14 @@ class rke::params {
   $calico_mtu                   = undef
   $calico_ippools               = undef
 
-
-  $certman_version        = undef
-  $certman_nameservers    = undef
-  $certman_namespace      = 'cert-manager'
   $certman_clusterissuers = undef
- 
+  $certman_gatewayapi     = false
+  $certman_issuers        = undef
+  $certman_listenersets   = false
+  $certman_namespace      = 'cert-manager'
+  $certman_nameservers    = undef
+  $certman_version        = undef
+
   $cilium_enabled               = true 
   $cilium_autodirectnoderouters = true
   $cilium_routingmode           = 'native'
