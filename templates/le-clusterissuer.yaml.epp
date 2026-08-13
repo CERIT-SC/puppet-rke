@@ -33,7 +33,7 @@ spec:
 <%- if $ingressclass { -%>
     - http01:
         ingress:
-          class: <%= $ingressclass %>
+          ingressClassName: <%= $ingressclass %>
           serviceType: ClusterIP 
 <%- } -%>
 <%- } else { -%>
