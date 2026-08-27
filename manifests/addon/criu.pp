@@ -9,5 +9,8 @@ class rke::addon::criu (
          ensure  => file,
          content => epp('rke/criu-runc.conf', {}),
        }
+       package{'cuda-checkpoint':
+         ensure  => present,
+       }
     }
 }

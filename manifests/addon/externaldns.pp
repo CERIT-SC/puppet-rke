@@ -8,6 +8,7 @@ class rke::addon::externaldns (
    String  $domainfilter = $rke::params::externaldns_domainfilter,
    String  $imageversion = $rke::params::externaldns_imageversion,
    String  $tag          = $rke::params::externaldns_tag,
+   Array[String] $sources = $rke::params::externaldns_sources,
 ) inherits rke::params {
     file{'/var/lib/rancher/rke2/server/manifests/externaldns-secret.yaml':
         ensure   => file,
@@ -18,8 +19,8 @@ class rke::addon::externaldns (
         ensure   => file,
         content  => epp('rke/externaldns.yaml', {"namespace" => $namespace, "dnsserver" => $server, "domain" => $domain,
                                                   "key" => $keyalgo, "keyname" => $keyname, "domainfilter" => $domainfilter,
-                                                  "dnssecret" => "dnssecret", "tagsuffix" => $tag, 
-                                                  "version" => $imageversion}),
+                                                  "dnssecret" => "dnssecret", "tagsuffix" => $tag,
+                                                  "version" => $imageversion, "sources" => $sources}),
         mode     => '0600',
     }
 }
