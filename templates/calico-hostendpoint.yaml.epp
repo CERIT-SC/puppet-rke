@@ -4,6 +4,11 @@ metadata:
   name: <%= regsubst("$hostname-$interface", '\.', '-', 'G') %>
   labels:
     host-endpoint: 'true'
+<%- if $labels != undef { -%>
+<%- $labels.each |$_k, $_v| { -%>
+    <%= $_k %>: '<%= $_v %>'
+<%- } -%>
+<%- } -%>
 spec:
   interfaceName: <%= $interface %>
   node: <%= $hostname %>

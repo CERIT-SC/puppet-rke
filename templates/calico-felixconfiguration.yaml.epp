@@ -1,0 +1,11 @@
+apiVersion: crd.projectcalico.org/v1
+kind: FelixConfiguration
+metadata:
+  name: node.<%= $hostname %>
+spec:
+<%- if $ipv4 != undef { -%>
+  deviceRouteSourceAddress: <%= $ipv4 %>
+<%- } -%>
+<%- if $ipv6 != undef { -%>
+  deviceRouteSourceAddressIPv6: <%= $ipv6 %>
+<%- } -%>

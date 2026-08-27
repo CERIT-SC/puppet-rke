@@ -27,6 +27,29 @@ spec:
         ports:
         - 179
   selector: has(host-endpoint)
+<%- if $denynfs { -%>
+---
+#nfs-deny.yaml
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: nfs-deny
+spec:
+  order: 11
+  applyOnForward: true
+  egress:
+    - action: Deny
+      protocol: TCP
+      source:
+        nets:
+<%- split($clustercidr, ",").each |$_cidr| { -%>
+        - <%= $_cidr %>
+<%- } -%>
+      destination:
+        ports:
+        - 2049
+  selector: has(host-endpoint)
+<%- } -%>
 ---
 #egress.yaml
 apiVersion: crd.projectcalico.org/v1
@@ -134,7 +157,15 @@ spec:
     destination:
       ports:
       - 179   # internal bgp
-      - 2112  # kube-vip 
+      - 2112  # kube-vip
+<%- if $cephmons { -%>
+      - 3300  # cephmons
+      - 9283  # cephmgr
+<%- } -%>
+<%- if $cephosds { -%>
+      - 6800:6830 #ceph osds
+      - 9926      #ceph monitoring
+<%- } -%>
       - 5473  # calico-typha
       - 6443  # kubeapi
       - 8003  # beegfs storage

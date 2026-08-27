@@ -4,23 +4,33 @@ class rke::addon::calico (
    Optional[Array]   $bgp_filter_imports    = $rke::params::calico_bgpfilterimports,
    Optional[Integer] $bgp_local_asn         = $rke::params::calico_bgplocalasn,
    Optional[Boolean] $bgp_nexthop           = $rke::params::calico_bgpnexthop,
+   Optional[String]  $bgp_password          = $rke::params::calico_bgppassword,
    Optional[Array]   $bgp_peers             = $rke::params::calico_bgppeers,
+   Boolean           $deny_nfs              = $rke::params::calico_deny_nfs,
    Boolean           $enable_failsafe       = $rke::params::calico_enablefailsafe,
    Boolean           $enable_firewall       = $rke::params::calico_enablefirewall,
    Boolean           $enable_wireguard      = $rke::params::calico_enablewireguard,
    String            $encapsulation         = $rke::params::calico_encapsulation,
+   Boolean           $felix_config          = $rke::params::calico_felixconfig,
+   Boolean           $fw_cephmons           = $rke::params::calico_fwcephmons,
+   Boolean           $fw_cephosds           = $rke::params::calico_fwcephosds,
    Boolean           $hostendpoints         = $rke::params::calico_hostendpoints,
+   Optional[Hash]    $hostendpoint_labels   = $rke::params::calico_hostendpointslabels,
    Optional[Hash]    $ip_pools              = $rke::params::calico_ippools,
    Optional[Array]   $lb_src_cidrs          = $rke::params::calico_lbsrccidrs,
    Optional[Array]   $local_cidrs           = $rke::params::calico_localcidrs,
    Optional[Integer] $mtu                   = $rke::params::calico_mtu,
-   Optional[String]  $bgp_password          = $rke::params::calico_bgppassword,
 ) inherits rke::params {
 
    if $hostendpoints {
      class{'rke::addon::calico::hostendpoints':
-        interfaces => unique(delete_undef_values([$rke::node_iface, $rke::node_iface6]))
+        interfaces => unique(delete_undef_values([$rke::node_iface, $rke::node_iface6])),
+        int_labels => $hostendpoint_labels,
      }
+   }
+
+   if $felix_config {
+     class{'rke::addon::calico::felixconfigurations':}
    }
 
    if $rke::controlnode {
@@ -57,6 +67,10 @@ class rke::addon::calico (
 
      if $hostendpoints {
        Rke::Addon::Calico::Hostendpoint<<| tag == $rke::server_addr |>>{}
+     }
+
+     if $felix_config {
+       Rke::Addon::Calico::Felixconfiguration<<| tag == $rke::server_addr |>>{}
      }
 
      if $bgp_peers {
