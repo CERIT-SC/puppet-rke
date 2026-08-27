@@ -1,0 +1,51 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    name: <%= $dnsissuer %>
+  name: <%= $dnsissuer %>
+  namespace: <%= $namespace %>
+spec:
+<%- if $nameserver or $ingressclass { -%>
+  acme:
+    email: <%= $email %>
+    preferredChain: ""
+    privateKeySecretRef:
+      name: <%= $secretref %>
+    server: <%= $serverurl %>
+    solvers:
+<%- if $nameserver { -%>
+    - dns01:
+        rfc2136:
+          nameserver: <%= $nameserver %>
+          tsigAlgorithm: <%= $keyalgo %>
+          tsigKeyName: <%= $keyname %>
+          tsigSecretSecretRef:
+            key: key
+            name: <%= $tsigsecret %>
+<%- if $domain { -%>
+      selector:
+        dnsZones:
+<%- $domain.each |$_d| { -%>
+        - '<%= $_d %>'
+<%- } -%>
+<%- } -%>
+<%- } -%>
+<%- if $ingressclass { -%>
+<%- if $ingressclass == "gatewayapi" { -%>
+    - http01:
+        gatewayHTTPRoute:
+           parentRefs:
+            - name: traefik-gateway
+              namespace: kube-system
+              kind: Gateway
+<%- } else { -%>
+    - http01:
+        ingress:
+          class: <%= $ingressclass %>
+          serviceType: ClusterIP 
+<%- } -%>
+<%- } -%>
+<%- } else { -%>
+  selfSigned: {}
+<%- } -%>

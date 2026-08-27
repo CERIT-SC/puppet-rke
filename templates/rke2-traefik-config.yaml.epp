@@ -1,0 +1,117 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    additionalArguments:
+      - '--global.checknewversion=false'
+      - '--log.level=INFO'
+      - '--entryPoints.websecure.asDefault=false'
+      - '--entrypoints.websecure.transport.respondingtimeouts.readtimeout=3600'
+<%- if $proxyreadtimeout { -%>
+      - '--providers.kubernetesingressnginx.proxyreadtimeout=<%= $proxyreadtimeout %>'
+<%- } -%>
+<%- if $oldstyle { -%>
+      - '--providers.kubernetesingressnginx'
+      - '--providers.kubernetesingressnginx.controllerclass=k8s.io/ingress-nginx'
+      - '--providers.kubernetesingressnginx.ingressclass=nginx'
+      - '--providers.kubernetesingressnginx.watchingresswithoutclass=true'
+      - '--providers.kubernetesingressnginx.publishstatusaddress=<%= $externalname %>'
+<%- } -%>
+    logs:
+      access:
+        enabled: true
+<%- if $metrics { -%>
+    metrics:
+      prometheus:
+        serviceMonitor:
+          enabled: true
+<%- } -%>
+    deployment:
+      kind: Deployment
+<%- if $replicas { -%>
+      replicas: <%= $replicas %>
+<%- } -%>
+<%- if $publicgateway { -%>
+    gateway:
+      annotations:
+        external-dns.alpha.kubernetes.io/target: '<%= $externalname %>'
+      listeners:
+        web:
+          namespacePolicy:
+            from: All
+<%- if $sslgateway { -%>
+        websecure:
+          port: 8443
+          protocol: HTTPS
+          namespacePolicy:
+            from: All
+          mode: Terminate
+          certificateRefs:
+            - name: traefik-gateway-certificate 
+              namespace: kube-system
+<%- } -%>
+<%- if $allowedlisteners { -%>
+      allowedListeners:
+        namespaces:
+          from: All
+<%- } -%>
+<%- } -%>
+<%- if $customimage { -%>
+    image:
+      registry: 'docker.io'
+      repository: 'traefik'
+      tag: '<%= $customimage %>'
+<%- } -%>
+    providers:
+      kubernetesGateway:
+        enabled: true
+<%- if $oldstyle != true { -%>
+      kubernetesIngressNginx:
+        enabled: true
+        ingressClass: "<%= $ingressclass %>"
+<%- if $ingresscontrollerclass { -%>
+        controllerClass: "<%= $ingresscontrollerclass %>"
+<%- } -%>
+        watchIngressWithoutClass: <%= $ingresswithoutclasss %>
+<%- if $externalname { -%>
+        publishStatusAddress: <%= $externalname %>
+<%- } -%>
+        #defaultBackendService: "default/default-backend"
+<%- } -%>
+    resources:
+<%- if $cpulimit != undef { -%>
+      limits:
+        cpu: <%= $cpulimit %>
+<%- } -%>
+      requests:
+<%- if $cpu != undef { -%>
+        cpu: <%= $cpu %>
+<%- } else { -%>
+        cpu: 100m
+<%- } -%>
+<%- if $memory != undef { -%>
+        memory: <%= $memory %>
+<%- } else { -%>
+        memory: 90Mi
+<%- } -%>
+    service:
+      annotations:
+        <%= $ipannotation %>: <%= $lbip %>
+      spec:
+        type: LoadBalancer
+        allocateLoadBalancerNodePorts: false
+<%- if $ipfamilies =~ Array { -%>
+        ipFamilies: ["<%= $ipfamilies.join('","') %>"]
+<%- if $ipfamilies.length > 1 { -%>
+        ipFamilyPolicy: RequireDualStack
+<%- } -%>
+<%- } -%>
+<%- if $ipfamilies =~ String { -%>
+        ipFamilies: ["<%= $ipfamilies %>"]
+<%- } -%>
+<%- if $externaltraffic != undef { -%>
+        externalTrafficPolicy: <%= $externaltraffic %>
+<%- } -%>
