@@ -21,16 +21,11 @@ class rke::addon::rkeingress (
   Optional[String]  $repository          = $rke::params::rkeingress_repository,
   Optional[String]  $tag                 = $rke::params::rkeingress_tag,
   Optional[Boolean] $underscores         = $rke::params::rkeingress_underscores,
+  Optional[String]  $protocols           = $rke::params::rkeingress_protocols,
 ) inherits rke::params {
     contain rke
 
     if $enabled {
-      if defined(Package['rke2']) {
-         $_require = Package['rke2']
-      } else {
-         $_require = Package_versionlock['rke2']
-      }
-
       if $ipv4 {
         $_families4 = "IPv4"
       } else {
@@ -70,9 +65,10 @@ class rke::addon::rkeingress (
                                                                'repository'          => $repository,
                                                                'tag'                 => $tag,
                                                                'underscores'         => $underscores,
+                                                               'protocols'           => $protocols,
                                                              }),
         mode    => '0600',
-        require => $_require,
+        require => Package_versionlock['rke2'],
       }
     } else {
       file{'/var/lib/rancher/rke2/server/manifests/rke2-ingress-nginx-config.yaml':

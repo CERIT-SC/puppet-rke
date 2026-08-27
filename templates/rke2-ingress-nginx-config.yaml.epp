@@ -87,6 +87,9 @@ spec:
           proxy-read-timeout: "<%= $proxytimeout %>"
           upstream-keepalive-timeout: "<%= $proxytimeout %>"
 <%- } -%>
+<%- if $protocols != undef { -%>
+          ssl-protocols: "<%= $protocols %>"
+<%- } -%>
 <%- if $customerrors { -%>
           custom-http-errors: "<%= $customerrors.join(",") %>"
 <%- } -%>

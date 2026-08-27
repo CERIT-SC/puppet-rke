@@ -31,10 +31,19 @@ spec:
 <%- } -%>
 <%- } -%>
 <%- if $ingressclass { -%>
+<%- if $ingressclass == "gatewayapi" { -%>
+    - http01:
+        gatewayHTTPRoute:
+           parentRefs:
+            - name: traefik-gateway
+              namespace: kube-system
+              kind: Gateway
+<%- } else { -%>
     - http01:
         ingress:
           ingressClassName: <%= $ingressclass %>
           serviceType: ClusterIP 
+<%- } -%>
 <%- } -%>
 <%- } else { -%>
   selfSigned: {}
