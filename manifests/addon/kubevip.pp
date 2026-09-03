@@ -5,7 +5,11 @@ class rke::addon::kubevip (
    Optional[String] $nodeselector  = $rke::params::kubevip_nodeselector,
    String           $image_version = $rke::params::kubevip_image_version,
 ) inherits rke::params {
-
+   if defined(Package['rke2']) {
+      $_require = Package['rke2']
+   } else {
+      $_require = Package_versionlock['rke2']
+   }
    file{'/var/lib/rancher/rke2/server/manifests/kube-vip.yaml':
       ensure  => file,
       content => epp('rke/kube-vip.yaml', {'vipInterface' => $iface,
@@ -13,8 +17,7 @@ class rke::addon::kubevip (
                                            'vipCidr'      => $vip_cidr,
                                            'nodeselector' => $nodeselector,
                                            'image'        => $image_version}),
-      require => Package_versionlock['rke2'],
+      require => $_require,
       mode    => '0600',
    }
-
 }

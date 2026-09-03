@@ -47,3 +47,7 @@ spec:
     hostFirewall:
       enabled: <%= $hostfirewall %>
 <%- } -%>
+<%- if $lbExternalClusterIP != undef { -%>
+    bpf:
+      lbExternalClusterIP: <%= $lbExternalClusterIP %>
+<%- } -%>
