@@ -12,17 +12,23 @@ class rke::params {
   $calico_bgpfilterimports      = undef
   $calico_bgpnexthop            = false
   $calico_bgppassword           = undef
+  $calico_deny_nfs              = false
   $calico_bgppeers              = undef
   $calico_enablefailsafe        = true
   $calico_enablefirewall        = false
   $calico_enablewireguard       = false
-  $calico_encapsulation         = 'none'    
+  $calico_encapsulation         = 'None' 
+  $calico_felixconfig           = false
   $calico_hostendpoints         = false
+  $calico_hostendpointslabels   = undef
   $calico_lbsrccidrs            = undef
   $calico_bgplocalasn           = undef
   $calico_localcidrs            = undef
   $calico_mtu                   = undef
   $calico_ippools               = undef
+  $calico_fwcephmons            = false
+  $calico_fwcephosds            = false
+
 
   $certman_clusterissuers = undef
   $certman_gatewayapi     = false
@@ -31,7 +37,7 @@ class rke::params {
   $certman_namespace      = 'cert-manager'
   $certman_nameservers    = undef
   $certman_version        = undef
-
+ 
   $cilium_enabled               = true 
   $cilium_autodirectnoderouters = true
   $cilium_routingmode           = 'native'
@@ -91,13 +97,12 @@ class rke::params {
   $nodev6cidr         = undef
 
   $controlplanerequests = false
+  $controlplanelimits   = false
 
   $csi_namespace         = 'csi-storage'
   $csi_create_namespace  = true
 
   $democratic_manual_values = ['csiDriver.name=org.democratic-csi.node-manual', 'controller.enabled=false', 'driver.config.driver=node-manual', 'driver.config.instance_id=manual', "'driver.config.service.node.capabilities.rpc={STAGE_UNSTAGE_VOLUME}'", 'node.driver.imagePullPolicy=Always', 'csiDriver.attachRequired=false']
-
-  $ingresscontroller     = undef
 
   $localcsi_version      = '2.0.0'
   $localcsi_namespace    = 'csi-storage'
@@ -135,8 +140,9 @@ class rke::params {
   $externaldns_keyalgo      = undef
   $externaldns_keyname      = undef
   $externaldns_domainfilter = undef
-  $externaldns_imageversion = 'v0.17.0'
+  $externaldns_imageversion = 'v0.21.0'
   $externaldns_tag          = undef
+  $externaldns_sources      = ['service', 'ingress']
 
   $graceperiod         = 30
   $graceperiodcritical = 20
@@ -149,12 +155,14 @@ class rke::params {
   $k8spreboot         = true
 
   $controllergates    = 'InPlacePodVerticalScalingExclusiveCPUs=true'
+  $controller_args    = undef
   $kubeletgates       = 'InPlacePodVerticalScalingExclusiveCPUs=true'
   $kubeapigates       = 'InPlacePodVerticalScalingExclusiveCPUs=true'
   $schedulergates     = 'InPlacePodVerticalScalingExclusiveCPUs=true'
 
-  $kubeapiburst       = 100
-  $kubeapiqps         = 100
+  $kubeapiburst       = undef
+  $kubeapiqps         = undef
+  $kubeapiparams      = undef
   $kubeletargs        = undef
   $kubeletconfigfile  = '/var/lib/rancher/rke2/agent/etc/kubelet.config'
   $kubelet_dir        = '/var/lib/kubelet'
@@ -165,9 +173,14 @@ class rke::params {
   $kubevip_nodeselector  = undef
   $kubevip_image_version = undef
 
+  $ingresscontroller     = undef
+
   $metallb_namespace  = 'metallb'
   $metallb_values     = ['controller.securityContext.runAsNonRoot=true', 'controller.securityContext.runAsUser=65534', 'controller.securityContext.runAsGroup=65534', 'controller.securityContext.fsGroup=65534', 'controller.securityContext.seccompProfile.type=RuntimeDefault', 'speaker.enabled=false']
   $metallb_version    = '0.15.2'
+
+  $multus_enabled     = true
+  $multus_whereabouts = true
 
   $nodelabels         = undef
   $nodemaxpods        = undef
@@ -183,6 +196,7 @@ class rke::params {
 
   $priority           = '-10'
   $priority_processes = ['kubelet', 'kube-controller-manager', 'kube-apiserver', 'kube-proxy', 'etcd']
+  $priority_realtime  = 0
   $priority_uid       = 998
 
   $proxyenv_enabled   = true
@@ -201,7 +215,7 @@ class rke::params {
 
   $registries         = undef
   $reg_custommirror   = undef 
-  $reg_dockermirror   = undef
+  $reg_dockermirror   = false
 
   $rke2_config        = '/etc/rancher/rke2/config.yaml'
 
@@ -232,6 +246,32 @@ class rke::params {
   $rkeingress_repository          = undef
   $rkeingress_tag                 = undef
   $rkeingress_underscores         = undef
+  $rkeingress_protocols           = undef
+
+  $rketraefik_enabled                = true
+  $rketraefik_ipv4                   = undef
+  $rketraefik_ipv6                   = undef
+  $rketraefik_ipannotation           = 'metallb.io/loadBalancerIPs'
+  $rketraefik_issuerkind             = 'ClusterIssuer'
+  $rketraefik_ingressclass           = 'nginx'
+  $rketraefik_ingresscontrollerclass = undef
+  $rketraefik_ingresswithoutclass    = true
+  $rketraefik_externaltraffic        = 'Local'
+  $rketraefik_cpu                    = '1'
+  $rketraefik_cpulimit               = undef
+  $rketraefik_memory                 = '2200Mi'
+  $rketraefik_externalname           = undef
+  $rketraefik_replicas               = undef
+  $rketraefik_oldstyleconfig         = undef
+  $rketraefik_metrics                = true
+  $rketraefik_publicgateway          = false
+  $rketraefik_proxyreadtimeout       = undef
+  $rketraefik_sslgateway             = false
+  $rketraefik_deploylbcert           = false
+  $rketraefik_certissuer             = undef
+  $rketraefik_additional_hostnames   = undef
+  $rketraefik_additionalsans         = undef
+  $rketraefik_allowedlisteners       = false
   
   $schedulerextenders = undef
   $schedulerpolicy    = undef
@@ -244,7 +284,8 @@ class rke::params {
   $staticcpupolicy    = undef
   $staticreservedcpus = undef
 
-  $tlssecurity        = true
+  $systemreservedmemory = '8Gi'
 
+  $tlssecurity        = true
   $use_version_lock   = true
 }
