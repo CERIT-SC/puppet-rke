@@ -5,7 +5,9 @@ class rke (
   String                  $cni                     = $rke::params::cni,
   String                  $cluster_cidr            = $rke::params::clustercidr,
   Optional[String]        $controller_gates        = $rke::params::controllergates,
+  Optional[Array]         $controller_args         = $rke::params::controller_args,
   Variant[Boolean,String] $controlplane_requests   = $rke::params::controlplanerequests,
+  Variant[Boolean,String] $controlplane_limits     = $rke::params::controlplanelimits,
   Boolean                 $disable_kubeproxy       = $rke::params::disablekubeproxy,
   Optional[String]        $etcd_s3_accesskey       = $rke::params::etcds3accesskey,
   Optional[String]        $etcd_s3_secretkey       = $rke::params::etcds3secretkey,
@@ -17,8 +19,9 @@ class rke (
   Optional[Integer]       $kubeapi_burst           = $rke::params::kubeapiburst,
   Optional[Integer]       $kubeapi_qps             = $rke::params::kubeapiqps,
   Optional[String]        $kubeapi_gates           = $rke::params::kubeapigates,
+  Optional[Array]         $kubeapi_params          = $rke::params::kubeapiparams,
   Optional[Array]         $kubelet_args            = $rke::params::kubeletargs,
-  Optional[Hash]          $node_labels             = $rke::params::nodelabels,          
+  Optional[Hash]          $node_labels             = $rke::params::nodelabels,
   String                  $node_type               = $rke::params::nodetype,
   Optional[Integer]       $nodev6_cidr             = $rke::params::nodev6cidr,
   Optional[String]        $http_proxy              = $rke::params::http_proxy,
@@ -30,7 +33,7 @@ class rke (
   Optional[Integer]       $node_max_pods           = $rke::params::nodemaxpods,
   Optional[String]        $node_taint              = $rke::params::nodetaint,
   Optional[Array]         $psa_privileged_ns       = $rke::params::psa_privileged_ns,
-  Optional[String]        $reg_dockermirror        = $rke::params::reg_dockermirror,
+  Variant[Boolean,String] $reg_dockermirror        = $rke::params::reg_dockermirror,
   Optional[Hash]          $reg_custommirror        = $rke::params::reg_custommirror,
   Optional[Hash]          $registries              = $rke::params::registries,
   Optional[String]        $scheduler_gates         = $rke::params::schedulergates,
@@ -41,16 +44,17 @@ class rke (
   String                  $server_addr             = $rke::params::serveraddr,
   Optional[String]        $static_cpu_policy       = $rke::params::staticcpupolicy,
   Optional[String]        $static_reserved_cpus    = $rke::params::staticreservedcpus,
+  Optional[String]        $system_reserved_memory  = $rke::params::systemreservedmemory,
   Boolean                 $tls_security            = $rke::params::tlssecurity,
   Boolean                 $controlnode             = $rke::params::controlnode,
   Optional[String]        $ingresscontroller       = $rke::params::ingresscontroller,
   Optional[String]        $token                   = undef,
 ) inherits rke::params {
-  
+
   contain rke::install
   contain rke::config
   contain rke::priority
-  contain rke::cishardening  
+  contain rke::cishardening
 
   if $facts['rke2token']  {
      @@rke::token{$facts['networking']['fqdn']:
