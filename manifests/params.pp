@@ -183,6 +183,7 @@ class rke::params {
 
   $priority           = '-10'
   $priority_processes = ['kubelet', 'kube-controller-manager', 'kube-apiserver', 'kube-proxy', 'etcd']
+  $priority_uid       = 998
 
   $proxyenv_enabled   = true
 
