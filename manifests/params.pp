@@ -41,7 +41,7 @@ class rke::params {
   $cilium_enabled               = true 
   $cilium_autodirectnoderouters = true
   $cilium_routingmode           = 'native'
-  $cilium_l2announcements       = true
+  $cilium_l2announcements       = false
   $cilium_bgpcontrolplane       = true
   $cilium_externalips           = true
   $cilium_ipv4cidr              = undef
