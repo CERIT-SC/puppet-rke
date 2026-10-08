@@ -66,7 +66,7 @@ class rke::addon::rketraefik (
                                                                'allowedlisteners'       => $allowedlisteners,
                                                              }),
         mode    => '0600',
-        require => Package_versionlock['rke2'],
+        #require => Package_versionlock['rke2'],
       }
 
       if $deploylbcert {
@@ -78,7 +78,7 @@ class rke::addon::rketraefik (
                                                         'additional_hostnames' => $additional_hostnames,
                                                         'additionalsans'       => $additionalsans }),
           mode    => '0600',
-          require => Package_versionlock['rke2'],
+          #require => Package_versionlock['rke2'],
         }
       }
     } else {
