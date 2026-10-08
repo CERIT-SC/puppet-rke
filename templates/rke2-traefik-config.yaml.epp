@@ -7,17 +7,15 @@ spec:
   valuesContent: |-
     additionalArguments:
       - '--global.checknewversion=false'
-      - '--log.level=INFO'
       - '--entryPoints.websecure.asDefault=false'
       - '--entrypoints.websecure.transport.respondingtimeouts.readtimeout=3600'
-<%- if $proxyreadtimeout { -%>
-      - '--providers.kubernetesingressnginx.proxyreadtimeout=<%= $proxyreadtimeout %>'
-<%- } -%>
 <%- if $oldstyle { -%>
       - '--providers.kubernetesingressnginx'
       - '--providers.kubernetesingressnginx.controllerclass=k8s.io/ingress-nginx'
       - '--providers.kubernetesingressnginx.ingressclass=nginx'
       - '--providers.kubernetesingressnginx.watchingresswithoutclass=true'
+<%- } -%>
+<%- if $externalname { -%>
       - '--providers.kubernetesingressnginx.publishstatusaddress=<%= $externalname %>'
 <%- } -%>
     logs:
@@ -66,10 +64,12 @@ spec:
       tag: '<%= $customimage %>'
 <%- } -%>
     providers:
+      kubernetesIngress:
+        enabled: false
       kubernetesGateway:
         enabled: true
 <%- if $oldstyle != true { -%>
-      kubernetesIngressNginx:
+      kubernetesIngressNGINX:
         enabled: true
         ingressClass: "<%= $ingressclass %>"
 <%- if $ingresscontrollerclass { -%>
@@ -77,9 +77,13 @@ spec:
 <%- } -%>
         watchIngressWithoutClass: <%= $ingresswithoutclasss %>
 <%- if $externalname { -%>
-        publishStatusAddress: <%= $externalname %>
+        publishService:
+          enabled: false
 <%- } -%>
         #defaultBackendService: "default/default-backend"
+<%- if $proxyreadtimeout { -%>
+        proxyReadTimeout: <%= $proxyreadtimeout %>
+<%- } -%>
 <%- } -%>
     resources:
 <%- if $cpulimit != undef { -%>
