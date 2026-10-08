@@ -1,9 +1,10 @@
 apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
+kind: Issuer
 metadata:
   labels:
     name: <%= $dnsissuer %>
   name: <%= $dnsissuer %>
+  namespace: <%= $namespace %>
 spec:
 <%- if $nameserver or $ingressclass { -%>
   acme:
@@ -41,7 +42,7 @@ spec:
 <%- } else { -%>
     - http01:
         ingress:
-          ingressClassName: <%= $ingressclass %>
+          class: <%= $ingressclass %>
           serviceType: ClusterIP 
 <%- } -%>
 <%- } -%>

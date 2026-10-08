@@ -55,7 +55,7 @@ spec:
           value: <%= $vipInterface %>
         - name: port
           value: "6443"
-        - name: vip_cidr
+        - name: vip_subnet
           value: "<%= $vipCidr %>"
         - name: cp_enable
           value: "true"
@@ -63,7 +63,7 @@ spec:
           value: kube-system
         - name: svc_enable
           value: "false"
-        - name: vip_address
+        - name: address
           value: '<%= $vipAddress %>'
         - name: lb_enable   ## lb does not support dualstack
           value: "false"     

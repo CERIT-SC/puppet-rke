@@ -28,12 +28,12 @@ class rke::addon::certmanager (
     } else {
        $_noproxy = undef
     }
-    
+
     if $nameservers != undef {
         $_nameservers = $nameservers.join('\,')
 
         if $rke::http_proxy {
-            $_set = concat(['crds.enabled=true', "'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=$_nameservers,--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false'], 
+            $_set = concat(['crds.enabled=true', "'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=$_nameservers,--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false'],
                         "http_proxy=${rke::http_proxy}", "https_proxy=${rke::http_proxy}", "'no_proxy=${_noproxy}'")
         } else {
            $_set = ['crds.enabled=true', "'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=$_nameservers,--enable-certificate-owner-ref=false}'", 'config.featureGates.ACMEHTTP01IngressPathTypeExact=false']

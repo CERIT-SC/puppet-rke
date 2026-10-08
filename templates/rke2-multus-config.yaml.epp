@@ -1,0 +1,22 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-multus
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    config:
+      cni_conf:
+        cleanupConfigOnExit: true
+    rke2-whereabouts:
+      enabled: <%= $whereabouts %>
+      nodeSelector:
+        feature.node.kubernetes.io/rdma.available: "true"
+      resources:
+        limits:
+            cpu: 1
+            memory: 300Mi
+        requests:
+            cpu: 1m
+            memory: 50Mi

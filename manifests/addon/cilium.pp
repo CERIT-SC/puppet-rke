@@ -34,7 +34,7 @@ class rke::addon::cilium (
       ensure  => file,
       content => epp('rke/rke2-cilium-config.yaml', { 'autodirectnoderouters' => $autodirectnoderouters,
                                                       'routingmode'           => $routingmode,
-                                                      'l2announcements'       => $l2announcements, 
+                                                      'l2announcements'       => $l2announcements,
                                                       'bgpcontrolplane'       => $bgpcontrolplane,
                                                       'externalips'           => $externalips,
                                                       'ipv4cidr'              => $ipv4cidr,
@@ -52,13 +52,13 @@ class rke::addon::cilium (
       file{'/var/lib/rancher/rke2/server/manifests/rke2-cilium-lb-cidrs.yaml':
         ensure  => file,
         content => epp('rke/cilium-lb-ipool.yaml.epp', { 'name'  => $lb_pool_name,
-                                                        'cidrs' => $lb_cidrs, 
+                                                        'cidrs' => $lb_cidrs,
                                                        }),
         require => $_require,
         mode    => '0600',
       }
     }
-    if $bgp_peers != undef { 
+    if $bgp_peers != undef {
       file{'/var/lib/rancher/rke2/server/manifests/rke2-cilium-bgppeers.yaml':
         ensure  => file,
         content => epp('rke/cilium-bgp.yaml', { 'advtype'     => $bgp_advtype,
@@ -85,5 +85,5 @@ class rke::addon::cilium (
     file{'/var/lib/rancher/rke2/server/manifests/rke2-cilium-bgppeers.yaml':
       ensure => absent,
     }
-  } 
+  }
 }

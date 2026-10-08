@@ -2,7 +2,7 @@ class rke::config::audit (
   Boolean          $enabled = $rke::params::audit_enabled,
   Optional[String] $level   = $rke::params::audit_level,
 ) inherits rke::params {
-  
+
   if $enabled {
     if defined(Package['rke2']) {
       $_require = Package['rke2']

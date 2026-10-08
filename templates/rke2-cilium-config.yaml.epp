@@ -16,7 +16,7 @@ spec:
 <%- } -%>
 <%- if $l2announcements != undef { -%>
     l2announcements:
-      enabeld: <%= $l2announcements %>
+      enabled: <%= $l2announcements %>
 <%- } -%>
 <%- if $bgpcontrolplane != undef { -%>
     bgpControlPlane: 

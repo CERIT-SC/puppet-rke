@@ -59,21 +59,31 @@ kube-controller-manager-arg:
         - "feature-gates=<%= $controllerfgates %>"
 <%- } -%>
         - "node-cidr-mask-size-ipv6=<%= $nodev6cidr %>"
+<%- if $controllerargs { -%>
+<%- $controllerargs.each |$_arg| { -%>
+        - "<%= $_arg -%>"
+<%- } -%>
+<%- } -%>
 
 <%- } else { -%>
 <%- if $controllerfgates { -%>
 kube-controller-manager-arg:
         - "feature-gates=<%= $controllerfgates %>"
+<%- if $controllerargs { -%>
+<%- $controllerargs.each |$_arg| { -%>
+        - "<%= $_arg -%>"
+<%- } -%>
+<%- } -%>
+<%- } -%>
+<%- } -%>
 
-<%- } -%>
-<%- } -%>
 <%- } -%>
 <%- if $nodetype =~ /controlplane/ { -%>
 <%- if $auditlog { -%>
 audit-policy-file: "/etc/rancher/rke2/audit-policy.yaml"
 
 <%- } -%>
-<%- if $auditlog { -%>
+<%- if $auditlog or $kubeapiserverparams { -%>
 kube-apiserver-arg:<% } %>
 <%- if $kubeapifgates { -%>
         - "feature-gates=<%= $kubeapifgates %>"
@@ -81,6 +91,7 @@ kube-apiserver-arg:<% } %>
 <%- if $auditlog { -%>
         - "audit-log-maxage=30"
         - "audit-log-maxbackup=10"
+        - "audit-log-mode=batch"
 <%- if $auditlogfile { -%>
         - "audit-log-path=<%= $auditlogfile %>"
 <%- } else { -%>
@@ -90,8 +101,13 @@ kube-apiserver-arg:<% } %>
         - "audit-log-maxsize=100"
         - "audit-log-format=json"
         - "audit-policy-file=/etc/rancher/rke2/audit-policy.yaml"
-
 <%- } -%>
+<%- if $kubeapiserverparams { -%>
+<%- $kubeapiserverparams.each |$_param| { -%>
+        - "<%= $_param %>"
+<%- } -%>
+<%- } -%>
+
 <%- if $etcds3accesskey { -%>
 etcd-s3-access-key: <%= $etcds3accesskey %>
 <%- } -%>
@@ -108,7 +124,8 @@ etcd-s3-bucket: <%= regsubst($etcds3path, '/.*', '') %>
 etcd-s3-folder: <%= regsubst($etcds3path, '^.*/', '') %>
 <%- } -%>
 <%- } -%>
-etcd-snapshot-schedule-cron: '0 */6 * * *'
+<%- $etcd_minute = if $facts['clusternodenumber'] { ((Integer($facts['clusternodenumber']) - 1) * 20) % 60 } else { 0 } -%>
+etcd-snapshot-schedule-cron: '<%= $etcd_minute %> */6 * * *'
 etcd-snapshot-retention: 10
 <%- if $etcdarg { -%>
 etcd-arg: <%= $etcdarg %>
@@ -160,7 +177,10 @@ node-ip: '<%= $nodeip %>'
 
 <%- } -%>
 <%- if $nodetype =~ /controlplane/ { -%>
-<%- if $controlplanerequests { -%>
+<%- if $controlplanelimits and $controlplanelimits != "" { -%>
+control-plane-resource-limits: "<%= $controlplanelimits %>"
+<%- } -%>
+<%- if $controlplanerequests and $controlplanerequests != "" { -%>
 control-plane-resource-requests: "<%= $controlplanerequests %>"
 
 <%- } -%>
@@ -174,6 +194,12 @@ disable-kube-proxy: true
 pod-security-admission-config-file: <%= $psaconfig %>
 <%- } -%>
 <%- if $ingresscontroller { -%>
+<%- if $ingresscontroller == 'all' { -%>
+ingress-controller:
+- ingress-nginx
+- traefik
+<%- } else { -%>
 ingress-controller: <%= $ingresscontroller %>
+<%- } -%>
 <%- } -%>
 <%- } -%>

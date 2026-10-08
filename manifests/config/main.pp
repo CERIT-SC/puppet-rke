@@ -4,8 +4,9 @@ class rke::config::main (
 
    $_configdir = dirname($file)
    exec {'mkdir-config':
-      command => "/bin/mkdir -p ${_configdir}",
-      unless  => "/bin/test -d ${_configdir}",
+      command => "mkdir -p ${_configdir}",
+      unless  => "test -d ${_configdir}",
+      path    => ['/bin', '/usr/bin'],
    }
 
    if defined(Package['rke2']) {
@@ -46,7 +47,7 @@ class rke::config::main (
      } else {
        $_ipv6 = undef
      }
-    
+
      if $_ipv6 != undef or $_ipv4 != undef {
        $_nodeip = delete_undef_values(flatten($_ipv4, $_ipv6)).join(',')
      } else {
@@ -70,6 +71,11 @@ class rke::config::main (
    }
 
    if $rke::node_type =~ /controlplane/ {
+     exec{'ensure rke2 manifests dir':
+       command => 'mkdir -p /var/lib/rancher/rke2/server/manifests',
+       unless  => 'test -d /var/lib/rancher/rke2/server/manifests',
+       path    => ['/bin', '/usr/bin'],
+     }
      if $rke::server_addr != $facts['clusterfullname'] {
        $_tlsnames = delete_undef_values([$facts['networking']['fqdn'], $facts['clusterfullname'], $rke::server_addr])
      } else {
@@ -84,7 +90,7 @@ class rke::config::main (
        ensure => directory,
      }
      if $rke::scheduler_extenders {
-       $_extenders = $rke::scheduler_extenders.map |$_extender| { 
+       $_extenders = $rke::scheduler_extenders.map |$_extender| {
          regsubst(regsubst(regsubst(to_yaml($_extender, {indentation => 2}), '^---\n', '', 'M'), '^', '  ', 'GM'), '^  ', '')
        }
      } else {
@@ -108,19 +114,15 @@ class rke::config::main (
      }
    }
 
-   if $rke::node_type =~ 'controlplane' {
-      if $rke::static_cpu_policy == 'true' or $rke::static_cpu_policy == 'reserveonly' {
-         $_reservecpu = "reserved-cpus=${rke::static_reserved_cpus}"
-      } else {
-         $_reservecpu = undef
-      }
-    } else {
-      if $rke::static_cpu_policy == 'true' or $rke::static_cpu_policy == 'reserveonly' {
-        $_reservecpu = ["system-reserved=memory=8Gi", "reserved-cpus=${rke::static_reserved_cpus}"]
-      } else {
-         $_reservecpu = undef
-      }
-    }
+    if $rke::static_cpu_policy == 'true' or $rke::static_cpu_policy == 'reserveonly' {
+       if $rke::node_type =~ 'controlplane' and $rke::node_type !~ 'worker' {
+          $_reservecpu = "reserved-cpus=${rke::static_reserved_cpus}"
+       } else {
+          $_reservecpu = ["system-reserved=memory=${rke::system_reserved_memory}", "reserved-cpus=${rke::static_reserved_cpus}"]
+       }
+     } else {
+       $_reservecpu = undef
+     }
 
     if $rke::node_max_pods {
        $_mpods = "max-pods=${rke::node_max_pods}"
@@ -159,6 +161,7 @@ class rke::config::main (
                                                      'auditlogfile'         => $rke::config::audit_log_file,
                                                      'nodeip'               => $_nodeip,
                                                      'controlplanerequests' => $rke::controlplane_requests,
+                                                     'controlplanelimits'   => $rke::controlplane_limits,
                                                      'internalingress'      => $rke::internal_ingress,
                                                      'nodetype'             => $rke::node_type,
                                                      'kubeletargs'          => $_kubeletargs,
@@ -177,7 +180,9 @@ class rke::config::main (
                                                      'tlssecurity'          => $rke::tls_security,
                                                      'kubeletfgates'        => $rke::kubelet_gates,
                                                      'kubeapifgates'        => $rke::kubeapi_gates,
+                                                     'kubeapiserverparams'  => $rke::kubeapi_params,
                                                      'controllerfgates'     => $rke::controller_gates,
+                                                     'controllerargs'       => $rke::controller_args,
                                                      'schedulerfgates'      => $rke::scheduler_gates,
                                                      'ingresscontroller'    => $rke::ingresscontroller,
                                                     }),

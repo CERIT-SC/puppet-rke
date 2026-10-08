@@ -4,7 +4,7 @@ class rke::config::proxyenv (
   Optional[String] $noproxy = $rke::no_proxy,
 ) inherits rke::params {
   if $enabled {
-     if $proxy {
+     if $proxy and $proxy != '' {
        file{'/etc/default/rke2-server':
           ensure => file,
           content => epp('rke/rke2-env', { proxy => $proxy, noproxy => $noproxy }),

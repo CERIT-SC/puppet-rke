@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: traefik-gateway-certificate
+  namespace: kube-system
+spec:
+<%- if $additionalsans { -%>
+  subject:
+    organizationalUnits:
+<%- $additionalsans.each |$san| { -%>
+    - '<%= $san %>'
+<%- } -%>
+<%- } -%>
+  issuerRef:
+    name: <%= $certissuer %>
+    kind: <%= $issuerkind %>
+    group: cert-manager.io
+  dnsNames:
+    - '<%= $hostname %>'
+<%- if $additional_hostnames { -%>
+<%- $additional_hostnames.each |$h| { -%>
+    - '<%= $h %>'
+<%- } -%>
+<%- } -%>
+  secretName: traefik-gateway-certificate
