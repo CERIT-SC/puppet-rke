@@ -58,6 +58,7 @@ class rke::params {
   $cilium_hostfirewall          = undef
   $cilium_devices               = undef
   $cilium_lbexternalclusterip   = false
+  $cilium_policycidrmatchmode   = undef
  
   $cis_enable         = true
   $cis_kubeconfigs    = ['/var/lib/rancher/rke2/server/cred/admin.kubeconfig',

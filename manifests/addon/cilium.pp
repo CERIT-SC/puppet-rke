@@ -19,6 +19,7 @@ class rke::addon::cilium (
   Optional[Boolean] $hostfirewall          = $rke::params::cilium_hostfirewall,
   Optional[String]  $devices               = $rke::params::cilium_devices,
   Optional[Boolean] $lbexternalclusterip   = $rke::params::cilium_lbexternalclusterip,
+  Optional[String]  $policycidrmatchmode   = $rke::params::cilium_policycidrmatchmode,
 ) inherits rke::params {
   contain rke
 
@@ -44,6 +45,7 @@ class rke::addon::cilium (
                                                       'hostfirewall'          => $hostfirewall,
                                                       'devices'               => $devices,
                                                       'lbExternalClusterIP'   => $lbexternalclusterip,
+                                                      'policycidrmatchmode'   => $policycidrmatchmode,
                                                     }),
       require => $_require,
       mode    => '0600',

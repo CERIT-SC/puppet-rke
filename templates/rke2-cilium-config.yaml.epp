@@ -51,3 +51,6 @@ spec:
     bpf:
       lbExternalClusterIP: <%= $lbExternalClusterIP %>
 <%- } -%>
+<%- if $policycidrmatchmode != undef { -%>
+    policyCIDRMatchMode: "<%= $policycidrmatchmode %>"
+<%- } -%>
