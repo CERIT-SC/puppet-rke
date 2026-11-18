@@ -95,6 +95,7 @@ spec:
 <%- } -%>
           limit-req-status-code: "429"
           limit-conn-status-code: "429"
+          use-http2: "false"
 <%- if $underscores != undef { -%>
           enable-underscores-in-headers: <%= $underscores %>
 <%- } -%>
